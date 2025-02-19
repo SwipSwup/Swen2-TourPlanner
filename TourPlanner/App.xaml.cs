@@ -10,4 +10,3 @@ namespace TourPlanner;
 public partial class App : Application
 {
 }
-
