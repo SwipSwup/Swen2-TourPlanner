@@ -10,8 +10,11 @@
 
     <ItemGroup>
       <Folder Include="Resources\" />
-      <Folder Include="ViewModels\" />
       <Folder Include="Views\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\BL\BL.csproj" />
     </ItemGroup>
 
 </Project>
