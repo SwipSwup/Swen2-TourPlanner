@@ -1,55 +1,41 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows;
-using TourPlanner.UI.Models;
 
-namespace TourPlanner.UI.ViewModels
+namespace TourPlanner
 {
-    public class MainViewModel : INotifyPropertyChanged
+    public class Tour
     {
-        private Tour _selectedTour;
+        public string Name { get; set; }
+    }
 
-        // ObservableCollection for holding tour data
+    public class TourLog
+    {
+        public string Date { get; set; }
+        public string Duration { get; set; }
+        public string Distance { get; set; }
+    }
+
+    public class MainViewModel
+    {
         public ObservableCollection<Tour> Tours { get; set; }
-
-        // Property for selected tour (used for binding)
-        public Tour SelectedTour
-        {
-            get => _selectedTour;
-            set
-            {
-                _selectedTour = value;
-                OnPropertyChanged();
-            }
-        }
+        public ObservableCollection<TourLog> TourLogs { get; set; }
 
         public MainViewModel()
         {
-            try
+            Tours = new ObservableCollection<Tour>
             {
-                // Adding some example tours to the ObservableCollection
-                Tours = new ObservableCollection<Tour>
-                {
-                    new Tour { Name = "Alps Hike", Description = "A scenic hike in the Alps with breathtaking views." },
-                    new Tour { Name = "Coastal Bike Ride", Description = "Ride along the coast, enjoying fresh sea breeze." },
-                    new Tour { Name = "Forest Adventure", Description = "Explore deep forests and natural trails." },
-                    new Tour { Name = "City Walking Tour", Description = "Discover historical places in the city." },
-                    new Tour { Name = "Desert Safari", Description = "Experience an exciting off-road trip in the dunes." }
-                };
-            }
-            catch (Exception ex)
-            {
-                // Error handling if something goes wrong
-                MessageBox.Show($"Error initializing tours: {ex.Message}");
-            }
-        }
+                new Tour { Name = "Wienerwald" },
+                new Tour { Name = "Dopplerhütte" },
+                new Tour { Name = "Figlwarte" },
+                new Tour { Name = "Dorfrunde" }
+            };
 
-        // Implementing the INotifyPropertyChanged interface
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            TourLogs = new ObservableCollection<TourLog>
+            {
+                new TourLog { Date = "Value 1", Duration = "Value 2", Distance = "Value 3" },
+                new TourLog { Date = "Value 4", Duration = "Value 5", Distance = "Value 6" },
+                new TourLog { Date = "Value 7", Duration = "Value 8", Distance = "Value 9" },
+                new TourLog { Date = "Value 10", Duration = "Value 11", Distance = "Value 12" }
+            };
         }
     }
 }
