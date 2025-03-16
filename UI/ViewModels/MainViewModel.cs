@@ -1,41 +1,57 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows.Input;
+using TourPlanner.UI.Commands;
+using TourPlanner.UI.Views;
 
 namespace TourPlanner
 {
-    public class Tour
-    {
-        public string Name { get; set; }
-    }
-
-    public class TourLog
-    {
-        public string Date { get; set; }
-        public string Duration { get; set; }
-        public string Distance { get; set; }
-    }
-
     public class MainViewModel
     {
         public ObservableCollection<Tour> Tours { get; set; }
-        public ObservableCollection<TourLog> TourLogs { get; set; }
+        public ICommand AddTourCommand { get; }
+        public ICommand OpenRemoveTourWindowCommand { get; }
+
+        private Tour _selectedTour;
+        public Tour SelectedTour
+        {
+            get => _selectedTour;
+            set => _selectedTour = value;
+        }
 
         public MainViewModel()
         {
-            Tours = new ObservableCollection<Tour>
-            {
-                new Tour { Name = "Wienerwald" },
-                new Tour { Name = "Dopplerhütte" },
-                new Tour { Name = "Figlwarte" },
-                new Tour { Name = "Dorfrunde" }
-            };
+            Tours = new ObservableCollection<Tour>();
+            AddTourCommand = new RelayCommand(AddTour);
+            OpenRemoveTourWindowCommand = new RelayCommand(OpenRemoveTourWindow);
+        }
 
-            TourLogs = new ObservableCollection<TourLog>
+        private void AddTour(object parameter)
+        {
+            var addTourWindow = new AddTourWindow();
+            if (addTourWindow.ShowDialog() == true)
             {
-                new TourLog { Date = "Value 1", Duration = "Value 2", Distance = "Value 3" },
-                new TourLog { Date = "Value 4", Duration = "Value 5", Distance = "Value 6" },
-                new TourLog { Date = "Value 7", Duration = "Value 8", Distance = "Value 9" },
-                new TourLog { Date = "Value 10", Duration = "Value 11", Distance = "Value 12" }
-            };
+                Tours.Add(new Tour
+                {
+                    Name = addTourWindow.TourName,
+                    Description = addTourWindow.TourDescription,
+                    From = addTourWindow.From,
+                    To = addTourWindow.To,
+                    TransportType = addTourWindow.TransportType,
+                    Distance = addTourWindow.Distance,
+                    EstimatedTime = addTourWindow.EstimatedTime,
+                    ImagePath = addTourWindow.ImagePath
+                });
+            }
+        }
+
+        // Open Remove Tour Window
+        private void OpenRemoveTourWindow(object parameter)
+        {
+            var removeWindow = new RemoveToursWindow(Tours);
+            if (removeWindow.ShowDialog() == true)
+            {
+                // Update the tour list after removal
+            }
         }
     }
 }
