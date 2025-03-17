@@ -42,6 +42,7 @@
                         <Button Content="+" Width="30" Command="{Binding AddTourCommand}"/>
                         <Button Content="-" Width="30" Command="{Binding OpenRemoveTourWindowCommand}"/>
                         <Button Content="..." Width="30" Command="{Binding OpenEditTourWindowCommand}" />
+
                     </StackPanel>
                 </StackPanel>
             </GroupBox>

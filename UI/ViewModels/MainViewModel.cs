@@ -12,6 +12,7 @@ public class MainViewModel : INotifyPropertyChanged
     public ICommand AddTourLogCommand { get; }
     public ICommand RemoveTourLogCommand { get; }
     public ICommand EditTourLogCommand { get; }
+    public ICommand OpenEditTourWindowCommand { get; }
 
     private Tour _selectedTour;
     public Tour SelectedTour
@@ -44,8 +45,23 @@ public class MainViewModel : INotifyPropertyChanged
         AddTourCommand = new RelayCommand(AddTour);
         AddTourLogCommand = new RelayCommand(AddTourLog);
         RemoveTourLogCommand = new RelayCommand(RemoveTourLog);
+        OpenEditTourWindowCommand = new RelayCommand(OpenEditTourWindow);
     }
 
+    private void OpenEditTourWindow(object parameter)
+    {
+        if (SelectedTour != null)
+        {
+            // Open the EditTourWindow and pass the selected tour
+            var editTourWindow = new EditTourWindow(SelectedTour);
+            if (editTourWindow.ShowDialog() == true)
+            {
+                // After editing, update the list (if necessary)
+                NotifyPropertyChanged(nameof(Tours));
+                NotifyPropertyChanged(nameof(SelectedTour));
+            }
+        }
+    }
     private void AddTour(object parameter)
     {
         var addTourWindow = new AddTourWindow();
