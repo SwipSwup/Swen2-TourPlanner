@@ -10,4 +10,7 @@ public class TourLog
 
     [Required]
     public string Distance { get; set; }
+
+    // Add this property to support selection in the UI
+    public bool IsSelected { get; set; }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 
 public class Tour
 {
@@ -28,4 +29,8 @@ public class Tour
     public string ImagePath { get; set; }
 
     public bool IsSelected { get; set; }
+
+    // TourLogs collection
+    public ObservableCollection<TourLog> TourLogs { get; set; } = new ObservableCollection<TourLog>();
+    public TourLog SelectedTourLog { get; set; } // To keep track of the selected TourLog for deletion/editing
 }

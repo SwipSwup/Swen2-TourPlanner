@@ -1,60 +1,63 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Input;
-using TourPlanner.UI.Commands;
-using TourPlanner.UI.Views;
 
-namespace TourPlanner.UI.ViewModels
+public class AddTourViewModel : INotifyPropertyChanged
 {
-    public class AddTourViewModel : INotifyPropertyChanged
+    private Tour _selectedTour;
+    private TourLog _selectedTourLog;
+    private ObservableCollection<Tour> _tours;
+
+    public ObservableCollection<Tour> Tours
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public ObservableCollection<Tour> Tours { get; set; }
-        public ObservableCollection<string> TransportTypes { get; set; }
-        public Tour NewTour { get; set; }
-        public Tour SelectedTour { get; set; }
-
-        // Commands
-        public ICommand ConfirmCommand { get; }
-        public ICommand CancelCommand { get; }
-        public ICommand OpenRemoveTourWindowCommand { get; }
-
-        public AddTourViewModel()
+        get => _tours;
+        set
         {
-            NewTour = new Tour();
-            Tours = new ObservableCollection<Tour>();
-            TransportTypes = new ObservableCollection<string> { "Car", "Bike", "Hiking", "Bus" };
-
-            // Commands
-            ConfirmCommand = new RelayCommand(Confirm);
-            CancelCommand = new RelayCommand(Cancel);
-            OpenRemoveTourWindowCommand = new RelayCommand(OpenRemoveTourWindow);
-        }
-
-        private void Confirm(object parameter)
-        {
-            ((AddTourWindow)parameter).DialogResult = true;
-        }
-
-        private void Cancel(object parameter)
-        {
-            ((AddTourWindow)parameter).DialogResult = false;
-        }
-
-        private void OpenRemoveTourWindow(object parameter)
-        {
-            var removeWindow = new RemoveToursWindow(Tours);
-            if (removeWindow.ShowDialog() == true)
+            if (_tours != value)
             {
-                NotifyPropertyChanged(nameof(Tours));
+                _tours = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+    public Tour SelectedTour
+    {
+        get => _selectedTour;
+        set
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            if (_selectedTour != value)
+            {
+                _selectedTour = value;
+                OnPropertyChanged();
+            }
         }
+    }
+
+    public TourLog SelectedTourLog
+    {
+        get => _selectedTourLog;
+        set
+        {
+            if (_selectedTourLog != value)
+            {
+                _selectedTourLog = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    // Implement INotifyPropertyChanged here
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public AddTourViewModel()
+    {
+        // Initialize the Tours collection
+        Tours = new ObservableCollection<Tour>();
     }
 }

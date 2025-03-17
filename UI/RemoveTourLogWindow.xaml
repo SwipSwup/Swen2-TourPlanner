@@ -1,0 +1,26 @@
+﻿<Window x:Class="TourPlanner.UI.Views.RemoveTourLogsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Remove Tour Logs" Height="400" Width="300" WindowStartupLocation="CenterOwner">
+    <Grid Margin="10">
+        <StackPanel>
+            <TextBlock Text="Select tour logs to remove:" Margin="0,0,0,10" FontWeight="Bold"/>
+
+            <ListBox x:Name="TourLogListBox" Height="250">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="5,0"/>
+                            <TextBlock Text="{Binding Date}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                <Button Content="OK" Width="75" Margin="5" Click="Ok_Click"/>
+                <Button Content="Cancel" Width="75" Margin="5" Click="Cancel_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
