@@ -9,12 +9,24 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Resources\" />
       <Folder Include="Views\" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\BL\BL.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Page Update="Resources\UserControlls\ConfirmCancelButtons.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+      <Page Update="Resources\UserControlls\TourFormControl.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
     </ItemGroup>
 
 </Project>
