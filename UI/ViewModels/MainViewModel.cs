@@ -67,6 +67,7 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
+
     private void OpenRemoveTourWindow(object parameter)
     {
         var removeToursWindow = new RemoveToursWindow(Tours);
@@ -116,10 +117,20 @@ public class MainViewModel : INotifyPropertyChanged
                     Distance = addTourLogWindow.Distance
                 };
 
+                // Validate the new TourLog before adding
+                var errors = newLog.Validate();
+                if (errors.Count > 0)
+                {
+                    MessageBox.Show(string.Join("\n", errors), "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return; // Don't add the log if there are errors
+                }
+
                 SelectedTour.TourLogs.Add(newLog);
             }
         }
     }
+
+
 
     private void RemoveTourLog(object parameter)
     {

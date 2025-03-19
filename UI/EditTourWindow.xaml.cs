@@ -37,9 +37,18 @@ namespace TourPlanner
             EditedTour.EstimatedTime = double.TryParse(TimeTextBox.Text, out var time) ? time : 0;
             EditedTour.ImagePath = ImagePathTextBox.Text;
 
+            // Validate the edited Tour before closing the window
+            var errors = EditedTour.Validate();
+            if (errors.Count > 0)
+            {
+                MessageBox.Show(string.Join("\n", errors), "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return; // Prevent closing the window if validation fails
+            }
+
             DialogResult = true;
             Close();
         }
+
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {

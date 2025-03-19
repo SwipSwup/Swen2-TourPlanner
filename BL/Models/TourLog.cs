@@ -3,6 +3,7 @@
 public class TourLog
 {
     [Required(ErrorMessage = "Date is required.")]
+    [RegularExpression(@"^\d{2}\.\d{2}\.\d{4}$", ErrorMessage = "Date must be in the format dd.mm.yyyy.")]
     public string Date { get; set; }
 
     [Required(ErrorMessage = "Duration is required.")]
@@ -14,4 +15,22 @@ public class TourLog
     public string Distance { get; set; }
 
     public bool IsSelected { get; set; }
+
+    // Validation method
+    public List<string> Validate()
+    {
+        var validationResults = new List<ValidationResult>();
+        var context = new ValidationContext(this);
+
+        bool isValid = Validator.TryValidateObject(this, context, validationResults, true);
+
+        List<string> errors = new List<string>();
+        foreach (var validationResult in validationResults)
+        {
+            errors.Add(validationResult.ErrorMessage);
+        }
+
+        return errors;
+    }
 }
+
