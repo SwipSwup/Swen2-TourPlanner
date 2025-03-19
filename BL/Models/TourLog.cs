@@ -18,7 +18,6 @@ public class TourLog
 
     public bool IsSelected { get; set; }
 
-    // Validation method
     public List<string> Validate()
     {
         var validationResults = new List<ValidationResult>();

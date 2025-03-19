@@ -32,9 +32,8 @@ public class Tour
 
     public bool IsSelected { get; set; }
 
-    // TourLogs collection
     public ObservableCollection<TourLog> TourLogs { get; set; } = new ObservableCollection<TourLog>();
-    public TourLog SelectedTourLog { get; set; } // To keep track of the selected TourLog for deletion/editing
+    public TourLog SelectedTourLog { get; set; } 
 
 
     public List<string> Validate()

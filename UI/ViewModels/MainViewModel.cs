@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using BL.Models;
-using TourPlanner;
 using UI.Commands;
 
 namespace UI.ViewModels;
@@ -27,20 +26,20 @@ public class MainViewModel : INotifyPropertyChanged
         {
             _selectedTour = value;
             NotifyPropertyChanged(nameof(SelectedTour));
-            NotifyPropertyChanged(nameof(TourLogs)); // Update TourLogs when the selected tour changes
+            NotifyPropertyChanged(nameof(TourLogs));
         }
     }
 
     public ObservableCollection<TourLog> TourLogs => SelectedTour?.TourLogs;
 
-    private TourLog _selectedTourLog;  // Add this property to track the selected TourLog
+    private TourLog _selectedTourLog;  
     public TourLog SelectedTourLog
     {
         get => _selectedTourLog;
         set
         {
             _selectedTourLog = value;
-            NotifyPropertyChanged(nameof(SelectedTourLog)); // Notify when SelectedTourLog changes
+            NotifyPropertyChanged(); 
         }
     }
 
@@ -58,11 +57,9 @@ public class MainViewModel : INotifyPropertyChanged
     {
         if (SelectedTour != null)
         {
-            // Open the EditTourWindow and pass the selected tour
             var editTourWindow = new EditTourWindow(SelectedTour);
             if (editTourWindow.ShowDialog() == true)
             {
-                // After editing, update the list (if necessary)
                 NotifyPropertyChanged(nameof(Tours));
                 NotifyPropertyChanged(nameof(SelectedTour));
             }
@@ -92,12 +89,11 @@ public class MainViewModel : INotifyPropertyChanged
                 ImagePath = addTourWindow.ImagePath,
             };
 
-            // Validierung aufrufen
             var errors = newTour.Validate();
             if (errors.Count > 0)
             {
                 MessageBox.Show(string.Join("\n", errors), "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return; // Tour wird nicht hinzugefügt, wenn Fehler vorhanden sind
+                return; 
             }
 
             Tours.Add(newTour);
@@ -119,12 +115,11 @@ public class MainViewModel : INotifyPropertyChanged
                     Distance = addTourLogWindow.Distance
                 };
 
-                // Validate the new TourLog before adding
                 var errors = newLog.Validate();
                 if (errors.Count > 0)
                 {
                     MessageBox.Show(string.Join("\n", errors), "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return; // Don't add the log if there are errors
+                    return; 
                 }
 
                 SelectedTour.TourLogs.Add(newLog);
@@ -138,8 +133,8 @@ public class MainViewModel : INotifyPropertyChanged
     {
         if (SelectedTour != null && SelectedTourLog != null)
         {
-            SelectedTour.TourLogs.Remove(SelectedTourLog); // Remove the selected TourLog
-            SelectedTourLog = null; // Deselect the TourLog
+            SelectedTour.TourLogs.Remove(SelectedTourLog); 
+            SelectedTourLog = null; 
         }
     }
 

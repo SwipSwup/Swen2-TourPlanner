@@ -15,7 +15,6 @@ public class RemoveCommandsViewModel
         _viewModel = viewModel;
         RemoveTourCommand = new RelayCommand(RemoveTour, CanRemoveTour);
 
-        // Listen for SelectedTour changes
         _viewModel.PropertyChanged += (sender, args) =>
         {
             if (args.PropertyName == nameof(AddTourViewModel.SelectedTour))

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="TourPlanner.UserControls.TourFormControl"
+﻿<UserControl x:Class="UI.Resources.UserControlls.TourFormControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Width="300" Height="200">

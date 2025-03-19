@@ -14,7 +14,7 @@ public abstract class AddTourViewModel : INotifyPropertyChanged
     public ObservableCollection<Tour> Tours
     {
         get => _tours;
-        set
+        init
         {
             if (_tours != value)
             {
@@ -51,15 +51,18 @@ public abstract class AddTourViewModel : INotifyPropertyChanged
     }
 
     // Implement INotifyPropertyChanged here
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public AddTourViewModel()
+    public AddTourViewModel(Tour selectedTour, TourLog selectedTourLog, ObservableCollection<Tour> tours)
     {
+        _selectedTour = selectedTour;
+        _selectedTourLog = selectedTourLog;
+        _tours = tours;
         // Initialize the Tours collection
         Tours = new ObservableCollection<Tour>();
     }

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace TourPlanner.UserControls
+namespace UI.Resources.UserControlls
 {
     public partial class TourFormControl : UserControl
     {

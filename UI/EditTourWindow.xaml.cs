@@ -28,7 +28,6 @@ namespace UI
 
         private void Confirm_Click(object sender, RoutedEventArgs e)
         {
-            // Save the updated data to the EditedTour object
             EditedTour.Name = NameTextBox.Text;
             EditedTour.Description = DescriptionTextBox.Text;
             EditedTour.From = FromTextBox.Text;
@@ -38,12 +37,11 @@ namespace UI
             EditedTour.EstimatedTime = double.TryParse(TimeTextBox.Text, out var time) ? time : 0;
             EditedTour.ImagePath = ImagePathTextBox.Text;
 
-            // Validate the edited Tour before closing the window
             var errors = EditedTour.Validate();
             if (errors.Count > 0)
             {
                 MessageBox.Show(string.Join("\n", errors), "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return; // Prevent closing the window if validation fails
+                return; 
             }
 
             DialogResult = true;
