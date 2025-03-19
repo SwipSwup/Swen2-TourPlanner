@@ -2,15 +2,16 @@
 
 public class TourLog
 {
-    [Required]
+    [Required(ErrorMessage = "Date is required.")]
     public string Date { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "Duration is required.")]
+    [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "Duration must be a numeric value.")]
     public string Duration { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "Distance is required.")]
+    [RegularExpression(@"^\d+(\.\d+)?$", ErrorMessage = "Distance must be a numeric value.")]
     public string Distance { get; set; }
 
-    // Add this property to support selection in the UI
     public bool IsSelected { get; set; }
 }

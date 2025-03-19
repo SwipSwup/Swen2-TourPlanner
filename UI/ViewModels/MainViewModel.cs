@@ -1,9 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Input;
 using TourPlanner;
 using TourPlanner.UI.Commands;
+using TourPlanner.UI.Views;
 
 public class MainViewModel : INotifyPropertyChanged
 {
@@ -13,6 +15,7 @@ public class MainViewModel : INotifyPropertyChanged
     public ICommand RemoveTourLogCommand { get; }
     public ICommand EditTourLogCommand { get; }
     public ICommand OpenEditTourWindowCommand { get; }
+    public ICommand OpenRemoveTourWindowCommand { get; }
 
     private Tour _selectedTour;
     public Tour SelectedTour
@@ -46,6 +49,7 @@ public class MainViewModel : INotifyPropertyChanged
         AddTourLogCommand = new RelayCommand(AddTourLog);
         RemoveTourLogCommand = new RelayCommand(RemoveTourLog);
         OpenEditTourWindowCommand = new RelayCommand(OpenEditTourWindow);
+        OpenRemoveTourWindowCommand = new RelayCommand(OpenRemoveTourWindow);
     }
 
     private void OpenEditTourWindow(object parameter)
@@ -61,6 +65,12 @@ public class MainViewModel : INotifyPropertyChanged
                 NotifyPropertyChanged(nameof(SelectedTour));
             }
         }
+    }
+
+    private void OpenRemoveTourWindow(object parameter)
+    {
+        var removeToursWindow = new RemoveToursWindow(Tours);
+        removeToursWindow.ShowDialog();
     }
     private void AddTour(object parameter)
     {
@@ -79,9 +89,18 @@ public class MainViewModel : INotifyPropertyChanged
                 ImagePath = addTourWindow.ImagePath,
             };
 
+            // Validierung aufrufen
+            var errors = newTour.Validate();
+            if (errors.Count > 0)
+            {
+                MessageBox.Show(string.Join("\n", errors), "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return; // Tour wird nicht hinzugefügt, wenn Fehler vorhanden sind
+            }
+
             Tours.Add(newTour);
         }
     }
+
 
     private void AddTourLog(object parameter)
     {
