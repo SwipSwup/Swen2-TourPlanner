@@ -1,5 +1,7 @@
 ﻿using System.Windows.Input;
-using TourPlanner.UI.Commands;
+using UI.Commands;
+
+namespace UI.ViewModels;
 
 public class RemoveCommandsViewModel
 {

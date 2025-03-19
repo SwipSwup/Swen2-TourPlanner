@@ -1,7 +1,6 @@
-﻿using System;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
-namespace TourPlanner.UI.Commands
+namespace UI.Commands
 {
     public class RelayCommand : ICommand
     {

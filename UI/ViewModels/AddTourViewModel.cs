@@ -3,7 +3,9 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using BL.Models;
 
-public class AddTourViewModel : INotifyPropertyChanged
+namespace UI.ViewModels;
+
+public abstract class AddTourViewModel : INotifyPropertyChanged
 {
     private Tour _selectedTour;
     private TourLog _selectedTourLog;

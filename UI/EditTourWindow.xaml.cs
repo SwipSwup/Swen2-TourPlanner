@@ -2,7 +2,7 @@
 using BL.Models;
 using Microsoft.Win32;
 
-namespace TourPlanner
+namespace UI
 {
     public partial class EditTourWindow : Window
     {

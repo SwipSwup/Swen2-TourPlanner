@@ -5,8 +5,9 @@ using System.Windows;
 using System.Windows.Input;
 using BL.Models;
 using TourPlanner;
-using TourPlanner.UI.Commands;
-using TourPlanner.UI.Views;
+using UI.Commands;
+
+namespace UI.ViewModels;
 
 public class MainViewModel : INotifyPropertyChanged
 {

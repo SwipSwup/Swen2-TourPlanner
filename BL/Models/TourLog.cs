@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+namespace BL.Models;
+
 public class TourLog
 {
     [Required(ErrorMessage = "Date is required.")]
@@ -33,4 +35,3 @@ public class TourLog
         return errors;
     }
 }
-

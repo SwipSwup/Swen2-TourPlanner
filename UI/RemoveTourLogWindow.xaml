@@ -1,4 +1,4 @@
-﻿<Window x:Class="TourPlanner.UI.Views.RemoveTourLogsWindow"
+﻿<Window x:Class="UI.RemoveTourLogsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Remove Tour Logs" Height="400" Width="300" WindowStartupLocation="CenterOwner">

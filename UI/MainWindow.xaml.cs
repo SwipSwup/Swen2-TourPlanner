@@ -1,6 +1,7 @@
 ﻿using System.Windows;
+using UI.ViewModels;
 
-namespace TourPlanner.UI
+namespace UI
 {
     public partial class MainWindow : Window
     {

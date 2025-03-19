@@ -1,4 +1,4 @@
-﻿<Window x:Class="TourPlanner.UI.Views.RemoveToursWindow"
+﻿<Window x:Class="UI.RemoveToursWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Remove Tours" Height="400" Width="300" WindowStartupLocation="CenterOwner">
