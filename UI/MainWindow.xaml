@@ -82,10 +82,7 @@
                     </Border>
                 </TabItem>
 
-                <!-- Miscellaneous Information -->
-                <TabItem Header="Misc">
-                    <TextBlock Text="Additional info can be placed here." Margin="10"/>
-                </TabItem>
+
             </TabControl>
 
             <!-- Tour Logs -->
