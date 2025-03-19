@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using BL.Models;
 
 namespace TourPlanner.UI.Views
 {

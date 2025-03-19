@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
+namespace BL.Models;
+
 public class Tour
 {
     [Required(ErrorMessage = "Name is required.")]

@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using BL.Models;
 using Microsoft.Win32;
 
 namespace TourPlanner

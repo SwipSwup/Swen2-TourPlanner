@@ -27,4 +27,10 @@
       <Folder Include="UI\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\BL\BL.csproj" />
+      <ProjectReference Include="..\DAL\DAL.csproj" />
+      <ProjectReference Include="..\UI\UI.csproj" />
+    </ItemGroup>
+
 </Project>
