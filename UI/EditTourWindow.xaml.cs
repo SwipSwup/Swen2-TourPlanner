@@ -6,9 +6,9 @@ namespace UI
 {
     public partial class EditTourWindow : Window
     {
-        public Tour EditedTour { get; private set; }
+        public TourDto EditedTour { get; private set; }
 
-        public EditTourWindow(Tour selectedTour)
+        public EditTourWindow(TourDto selectedTour)
         {
             InitializeComponent();
             EditedTour = selectedTour;
@@ -33,10 +33,10 @@ namespace UI
             EditedTour.From = FromTextBox.Text;
             EditedTour.To = ToTextBox.Text;
             EditedTour.TransportType = TransportTypeComboBox.SelectedItem?.ToString();
-            EditedTour.Distance = double.TryParse(DistanceTextBox.Text, out var dist) ? dist : 0;
-            EditedTour.EstimatedTime = double.TryParse(TimeTextBox.Text, out var time) ? time : 0;
+            EditedTour.Distance = float.TryParse(DistanceTextBox.Text, out var dist) ? dist : 0;
+            EditedTour.EstimatedTime = TimeSpan.TryParse(TimeTextBox.Text, out var time) ? time : TimeSpan.Zero;
             EditedTour.ImagePath = ImagePathTextBox.Text;
-
+            
             var errors = EditedTour.Validate();
             if (errors.Count > 0)
             {

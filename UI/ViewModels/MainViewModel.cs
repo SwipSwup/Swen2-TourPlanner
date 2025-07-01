@@ -4,13 +4,16 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using BL.Models;
+using BL.Services;
 using UI.Commands;
 
 namespace UI.ViewModels;
 
 public class MainViewModel : INotifyPropertyChanged
 {
-    public ObservableCollection<Tour> Tours { get; set; }
+    private readonly TourService _tourService;
+    
+    public ObservableCollection<TourDto> Tours { get; set; }
     public ICommand AddTourCommand { get; }
     public ICommand AddTourLogCommand { get; }
     public ICommand RemoveTourLogCommand { get; }
@@ -18,8 +21,8 @@ public class MainViewModel : INotifyPropertyChanged
     public ICommand OpenEditTourWindowCommand { get; }
     public ICommand OpenRemoveTourWindowCommand { get; }
 
-    private Tour _selectedTour;
-    public Tour SelectedTour
+    private TourDto _selectedTour;
+    public TourDto SelectedTour
     {
         get => _selectedTour;
         set
@@ -30,10 +33,10 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public ObservableCollection<TourLog> TourLogs => SelectedTour?.TourLogs;
+    public ObservableCollection<TourLogDto>? TourLogs => null; //TODO change /*SelectedTour.TourLogs;*/
 
-    private TourLog _selectedTourLog;  
-    public TourLog SelectedTourLog
+    private TourLogDto _selectedTourLog;  
+    public TourLogDto SelectedTourLog
     {
         get => _selectedTourLog;
         set
@@ -43,9 +46,11 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public MainViewModel()
+    public MainViewModel(TourService tourService)
     {
-        Tours = new ObservableCollection<Tour>();
+        _tourService = tourService;
+
+        Tours = new ObservableCollection<TourDto>();
         AddTourCommand = new RelayCommand(AddTour);
         AddTourLogCommand = new RelayCommand(AddTourLog);
         RemoveTourLogCommand = new RelayCommand(RemoveTourLog);
@@ -77,7 +82,7 @@ public class MainViewModel : INotifyPropertyChanged
         var addTourWindow = new AddTourWindow();
         if (addTourWindow.ShowDialog() == true)
         {
-            var newTour = new Tour
+            var newTour = new TourDto
             {
                 Name = addTourWindow.TourName,
                 Description = addTourWindow.TourDescription,
@@ -108,7 +113,9 @@ public class MainViewModel : INotifyPropertyChanged
             var addTourLogWindow = new AddTourLogWindow();
             if (addTourLogWindow.ShowDialog() == true)
             {
-                var newLog = new TourLog
+                //TODO change
+                /*
+                var newLog = new TourLogDto
                 {
                     Date = addTourLogWindow.Date,
                     Duration = addTourLogWindow.Duration,
@@ -123,6 +130,7 @@ public class MainViewModel : INotifyPropertyChanged
                 }
 
                 SelectedTour.TourLogs.Add(newLog);
+                */
             }
         }
     }

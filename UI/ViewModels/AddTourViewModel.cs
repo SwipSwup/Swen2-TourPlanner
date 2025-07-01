@@ -7,11 +7,11 @@ namespace UI.ViewModels;
 
 public abstract class AddTourViewModel : INotifyPropertyChanged
 {
-    private Tour _selectedTour;
-    private TourLog _selectedTourLog;
-    private ObservableCollection<Tour> _tours;
+    private TourDto _selectedTour;
+    private TourLogDto _selectedTourLog;
+    private ObservableCollection<TourDto> _tours;
 
-    public ObservableCollection<Tour> Tours
+    public ObservableCollection<TourDto> Tours
     {
         get => _tours;
         init
@@ -24,7 +24,7 @@ public abstract class AddTourViewModel : INotifyPropertyChanged
         }
     }
 
-    public Tour SelectedTour
+    public TourDto SelectedTour
     {
         get => _selectedTour;
         set
@@ -37,7 +37,7 @@ public abstract class AddTourViewModel : INotifyPropertyChanged
         }
     }
 
-    public TourLog SelectedTourLog
+    public TourLogDto SelectedTourLog
     {
         get => _selectedTourLog;
         set
@@ -58,12 +58,12 @@ public abstract class AddTourViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public AddTourViewModel(Tour selectedTour, TourLog selectedTourLog, ObservableCollection<Tour> tours)
+    public AddTourViewModel(TourDto selectedTour, TourLogDto selectedTourLog, ObservableCollection<TourDto> tours)
     {
         _selectedTour = selectedTour;
         _selectedTourLog = selectedTourLog;
         _tours = tours;
         // Initialize the Tours collection
-        Tours = new ObservableCollection<Tour>();
+        Tours = new ObservableCollection<TourDto>();
     }
 }
