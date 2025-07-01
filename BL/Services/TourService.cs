@@ -59,7 +59,6 @@ public class TourService(ITourRepository repo, IRouteService routeService)
             TransportType = dto.TransportType,
             Distance = route.Distance,
             EstimatedTime = route.EstimatedTime,
-            ImagePath = route.ImagePath
         };
 
         await repo.AddTourAsync(tour);

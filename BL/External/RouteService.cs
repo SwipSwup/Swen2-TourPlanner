@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Globalization;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace BL.External;
@@ -51,11 +52,10 @@ public class RouteService : IRouteService
         {
             Distance = distance,
             EstimatedTime = duration,
-            ImagePath = $"https://staticmap.openstreetmap.de/staticmap.php?" +
-                        $"center={startCoords.Latitude}," +
-                        $"{startCoords.Longitude}&zoom=12&size=600x400&markers={startCoords.Latitude}," +
-                        $"{startCoords.Longitude}," +
-                        $"red1|{endCoords.Latitude},{endCoords.Longitude},blue" 
+            StartLatitude = startCoords.Latitude,
+            StartLongitude = startCoords.Longitude,
+            EndLatitude = endCoords.Latitude,
+            EndLongitude = endCoords.Longitude
         };
     }
 
@@ -69,6 +69,7 @@ public class RouteService : IRouteService
             return null;
 
         string json = await response.Content.ReadAsStringAsync();
+        
         using JsonDocument doc = JsonDocument.Parse(json);
         JsonElement coords = doc.RootElement.GetProperty("features")[0].GetProperty("geometry")
             .GetProperty("coordinates");
