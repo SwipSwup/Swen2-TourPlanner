@@ -6,9 +6,9 @@ namespace UI
 {
     public partial class RemoveToursWindow : Window
     {
-        public ObservableCollection<Tour> Tours { get; set; }
+        public ObservableCollection<TourDto> Tours { get; set; }
 
-        public RemoveToursWindow(ObservableCollection<Tour> tours)
+        public RemoveToursWindow(ObservableCollection<TourDto> tours)
         {
             InitializeComponent();
             Tours = tours;

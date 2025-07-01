@@ -10,8 +10,8 @@ namespace UI
         public string From { get; private set; }
         public string To { get; private set; }
         public string TransportType { get; private set; }
-        public double Distance { get; private set; }
-        public double EstimatedTime { get; private set; }
+        public float Distance { get; private set; }
+        public TimeSpan EstimatedTime { get; private set; }
         public string ImagePath { get; private set; }
 
         public AddTourWindow()
@@ -27,8 +27,8 @@ namespace UI
             From = FromTextBox.Text;
             To = ToTextBox.Text;
             TransportType = TransportTypeComboBox.SelectedItem?.ToString();
-            Distance = double.TryParse(DistanceTextBox.Text, out var dist) ? dist : 0;
-            EstimatedTime = double.TryParse(TimeTextBox.Text, out var time) ? time : 0;
+            Distance = float.TryParse(DistanceTextBox.Text, out var dist) ? dist : 0;
+            EstimatedTime = TimeSpan.TryParse(TimeTextBox.Text, out var time) ? time : TimeSpan.Zero;
             ImagePath = ImagePathTextBox.Text;
 
             DialogResult = true;

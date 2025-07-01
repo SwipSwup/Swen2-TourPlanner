@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Repositories;
 
-public class TourRepository(TourPlannerContext context)
+public class TourRepository(TourPlannerContext context) : ITourRepository
 {
     public async Task<List<Tour>> GetAllToursAsync()
         => await context.Tours.Include(t => t.TourLogs).ToListAsync();
