@@ -12,8 +12,9 @@ namespace UI.ViewModels;
 public class MainViewModel : INotifyPropertyChanged
 {
     private readonly ITourService _tourService;
-    
+
     public ObservableCollection<TourDto> Tours { get; set; }
+
     public ICommand AddTourCommand { get; }
     public ICommand AddTourLogCommand { get; }
     public ICommand RemoveTourLogCommand { get; }
@@ -21,28 +22,36 @@ public class MainViewModel : INotifyPropertyChanged
     public ICommand OpenEditTourWindowCommand { get; }
     public ICommand OpenRemoveTourWindowCommand { get; }
 
-    private TourDto _selectedTour;
-    public TourDto SelectedTour
+    private TourDto? _selectedTour;
+    public TourDto? SelectedTour
     {
         get => _selectedTour;
         set
         {
-            _selectedTour = value;
-            NotifyPropertyChanged(nameof(SelectedTour));
-            NotifyPropertyChanged(nameof(TourLogs));
+            if (_selectedTour != value)
+            {
+                _selectedTour = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged(nameof(TourLogs));
+            }
         }
     }
 
-    public ObservableCollection<TourLogDto>? TourLogs => null; //TODO change /*SelectedTour.TourLogs;*/
+    public ObservableCollection<TourLogDto>? TourLogs => SelectedTour != null
+        ? new ObservableCollection<TourLogDto>(SelectedTour.TourLogs ?? new List<TourLogDto>())
+        : null;
 
-    private TourLogDto _selectedTourLog;
-    public TourLogDto SelectedTourLog
+    private TourLogDto? _selectedTourLog;
+    public TourLogDto? SelectedTourLog
     {
         get => _selectedTourLog;
         set
         {
-            _selectedTourLog = value;
-            NotifyPropertyChanged();
+            if (_selectedTourLog != value)
+            {
+                _selectedTourLog = value;
+                NotifyPropertyChanged();
+            }
         }
     }
 
@@ -51,33 +60,15 @@ public class MainViewModel : INotifyPropertyChanged
         _tourService = tourService;
 
         Tours = new ObservableCollection<TourDto>();
-        AddTourCommand = new RelayCommand(AddTour);
-        AddTourLogCommand = new RelayCommand(AddTourLog);
-        RemoveTourLogCommand = new RelayCommand(RemoveTourLog);
-        OpenEditTourWindowCommand = new RelayCommand(OpenEditTourWindow);
-        OpenRemoveTourWindowCommand = new RelayCommand(OpenRemoveTourWindow);
+
+        AddTourCommand = new RelayCommand(async _ => await AddTour());
+        AddTourLogCommand = new RelayCommand(_ => AddTourLog());
+        RemoveTourLogCommand = new RelayCommand(_ => RemoveTourLog());
+        OpenEditTourWindowCommand = new RelayCommand(_ => OpenEditTourWindow());
+        OpenRemoveTourWindowCommand = new RelayCommand(_ => OpenRemoveTourWindow());
     }
 
-    private void OpenEditTourWindow(object parameter)
-    {
-        if (SelectedTour != null)
-        {
-            var editTourWindow = new EditTourWindow(SelectedTour);
-            if (editTourWindow.ShowDialog() == true)
-            {
-                NotifyPropertyChanged(nameof(Tours));
-                NotifyPropertyChanged(nameof(SelectedTour));
-            }
-        }
-    }
-
-
-    private void OpenRemoveTourWindow(object parameter)
-    {
-        var removeToursWindow = new RemoveToursWindow(Tours);
-        removeToursWindow.ShowDialog();
-    }
-    private async void AddTour(object parameter)
+    private async System.Threading.Tasks.Task AddTour()
     {
         var addTourWindow = new AddTourWindow();
         if (addTourWindow.ShowDialog() == true)
@@ -92,7 +83,6 @@ public class MainViewModel : INotifyPropertyChanged
                 Distance = addTourWindow.Distance,
                 EstimatedTime = addTourWindow.EstimatedTime
             };
-
 
             var errors = newTour.Validate();
             if (errors.Count > 0)
@@ -120,25 +110,24 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-
-
-
-
-
-    private void AddTourLog(object parameter)
+    private void AddTourLog()
     {
         if (SelectedTour != null)
         {
             var addTourLogWindow = new AddTourLogWindow();
             if (addTourLogWindow.ShowDialog() == true)
             {
-                //TODO change
+                // TODO: Implement adding tour log logic, e.g.:
                 /*
                 var newLog = new TourLogDto
                 {
-                    Date = addTourLogWindow.Date,
+                    DateTime = addTourLogWindow.DateTime,
                     Duration = addTourLogWindow.Duration,
-                    Distance = addTourLogWindow.Distance
+                    TotalDistance = addTourLogWindow.TotalDistance,
+                    Comment = addTourLogWindow.Comment,
+                    Difficulty = addTourLogWindow.Difficulty,
+                    TotalTime = addTourLogWindow.TotalTime,
+                    Rating = addTourLogWindow.Rating
                 };
 
                 var errors = newLog.Validate();
@@ -149,20 +138,40 @@ public class MainViewModel : INotifyPropertyChanged
                 }
 
                 SelectedTour.TourLogs.Add(newLog);
+                NotifyPropertyChanged(nameof(TourLogs));
                 */
             }
         }
     }
 
-
-
-    private void RemoveTourLog(object parameter)
+    private void RemoveTourLog()
     {
         if (SelectedTour != null && SelectedTourLog != null)
         {
             SelectedTour.TourLogs.Remove(SelectedTourLog);
             SelectedTourLog = null;
+            NotifyPropertyChanged(nameof(TourLogs));
         }
+    }
+
+    private void OpenEditTourWindow()
+    {
+        if (SelectedTour != null)
+        {
+            var editTourWindow = new EditTourWindow(SelectedTour);
+            if (editTourWindow.ShowDialog() == true)
+            {
+                NotifyPropertyChanged(nameof(Tours));
+                NotifyPropertyChanged(nameof(SelectedTour));
+                NotifyPropertyChanged(nameof(TourLogs));
+            }
+        }
+    }
+
+    private void OpenRemoveTourWindow()
+    {
+        var removeToursWindow = new RemoveToursWindow(Tours);
+        removeToursWindow.ShowDialog();
     }
 
     private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -170,5 +179,5 @@ public class MainViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 }

@@ -1,38 +1,43 @@
-﻿using System.Windows;
-using BL.External;
+﻿using System;
+using System.Windows;
 using BL.Services;
-using DAL.Repositories;
-using Microsoft.Extensions.DependencyInjection;
 using UI.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace UI
 {
     public partial class MainWindow : Window
     {
-        private readonly ITourRepository _repository;
-        
+        private readonly ITourService _tourService;
+        private readonly MainViewModel _viewModel;
+
         public MainWindow()
         {
             InitializeComponent();
-            _repository = App.AppHost.Services.GetRequiredService<ITourRepository>();
-            
-            var vm = App.AppHost.Services.GetRequiredService<MainViewModel>();
-            DataContext = vm;
-            
+
+            _tourService = App.AppHost.Services.GetRequiredService<ITourService>();
+            _viewModel = App.AppHost.Services.GetRequiredService<MainViewModel>();
+
+            DataContext = _viewModel;
 
             LoadTours();
         }
-        
+
         private async void LoadTours()
         {
             try
             {
-                var tours = await _repository.GetAllToursAsync();
-                // TODO bind ui
+                var tours = await _tourService.GetAllToursAsync();
+
+                _viewModel.Tours.Clear();
+                foreach (var tour in tours)
+                {
+                    _viewModel.Tours.Add(tour);
+                }
             }
             catch (Exception e)
             {
-                throw; // TODO handle exception
+                MessageBox.Show($"Failed to load tours: {e.Message}");
             }
         }
     }
