@@ -1,4 +1,4 @@
-﻿namespace BL.Models;
+﻿namespace BL.DTOs;
 
 public class TourDto
 {

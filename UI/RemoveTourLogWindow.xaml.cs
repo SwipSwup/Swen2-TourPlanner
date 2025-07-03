@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
-using BL.Models;
+using BL.DTOs;
 
 namespace UI
 {

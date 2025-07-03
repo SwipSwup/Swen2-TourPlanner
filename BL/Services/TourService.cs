@@ -1,5 +1,5 @@
-﻿using BL.External;
-using BL.Models;
+﻿using BL.DTOs;
+using BL.External;
 using DAL.Models;
 using DAL.Repositories;
 
