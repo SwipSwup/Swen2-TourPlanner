@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using BL.Models;
+using BL.DTOs;
 using Microsoft.Win32;
 
 namespace UI
