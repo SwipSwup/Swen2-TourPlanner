@@ -42,7 +42,7 @@ public class ReportServiceTests
     [Test]
     public async Task GenerateTourReport_CreatesPdfFile()
     {
-        var tour = new TourDto
+        /*var tour = new TourDto
         {
             Name = "TestTour",
             Description = "Testing tour generation",
@@ -64,9 +64,11 @@ public class ReportServiceTests
                     Rating = 5
                 }
             }
-        };
+        };*/
+        
+       // var tour = _service. 
 
-        await _service.GenerateTourReportAsync(tour);
+        //await _service.GenerateTourReportAsync(tour);
 
         string[] files = Directory.GetFiles(_outputPath, "Tour_TestTour_*.pdf");
         

@@ -11,7 +11,7 @@ namespace UI.ViewModels;
 
 public class MainViewModel : INotifyPropertyChanged
 {
-    private readonly TourService _tourService;
+    private readonly ITourService _tourService;
     
     public ObservableCollection<TourDto> Tours { get; set; }
     public ICommand AddTourCommand { get; }
@@ -46,7 +46,7 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public MainViewModel(TourService tourService)
+    public MainViewModel(ITourService tourService)
     {
         _tourService = tourService;
 
