@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Windows;
 using BL.External;
 using BL.Services;
+using BL.TourImage;
 using DAL;
 using DAL.Repositories;
 using log4net;
@@ -32,10 +33,15 @@ namespace UI
                     services.AddDbContext<TourPlannerContext>(options =>
                         options.UseNpgsql(context.Configuration.GetConnectionString("DefaultConnection")));
 
+                    services.AddTransient<IMapImageGenerator, MapImageGenerator>();
+                    services.AddTransient<ITourService, TourService>();
+                    
                     services.AddScoped<ITourRepository, TourRepository>();
                     
                     services.AddScoped<IRouteService, RouteService>();
-                    services.AddScoped<TourService>();
+                    services.AddScoped<IReportService, ReportService>();
+                    
+                    
                     services.AddScoped<MainViewModel>();
                     
                 })
