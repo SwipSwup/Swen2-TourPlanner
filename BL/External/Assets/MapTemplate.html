@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Tour Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <style>
+        html, body, #map { height: 100%; margin: 0; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    const startLat = {{startLat}};
+    const startLon = {{startLon}};
+    const endLat = {{endLat}};
+    const endLon = {{endLon}};
+
+    const map = L.map('map').setView([(startLat + endLat) / 2, (startLon + endLon) / 2], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    L.marker([startLat, startLon]).addTo(map).bindPopup("Start").openPopup();
+    L.marker([endLat, endLon]).addTo(map).bindPopup("End");
+
+    const route = L.polyline([
+        [startLat, startLon],
+        [endLat, endLon]
+    ], {color: 'blue'}).addTo(map);
+
+    setTimeout(() => {
+        window.status = "ready";
+    }, 1000); // Give map time to load
+</script>
+</body>
+</html>

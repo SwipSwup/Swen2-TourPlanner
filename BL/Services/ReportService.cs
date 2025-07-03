@@ -2,6 +2,7 @@
 using BL.DTOs.Report;
 using BL.Reports;
 using Microsoft.Extensions.Configuration;
+using QuestPDF.Infrastructure;
 
 namespace BL.Services;
 
@@ -12,18 +13,23 @@ public class ReportService(IConfiguration config) : IReportService
 
     public Task GenerateTourReportAsync(TourDto tour)
     {
-        string fileName = Path.Combine(_outputPath, $"Tour_{tour.Name}_{DateTime.Now:yyyyMMddHHmmss}.pdf");
+        QuestPDF.Settings.License = LicenseType.Community;
+        
+        string fileName = Path.Combine(AppContext.BaseDirectory, _outputPath, $"Tour_{tour.Name}_{DateTime.Now:yyyyMMddHHmmss}.pdf");
         Directory.CreateDirectory(_outputPath);
+        
         TourReportGenerator.Generate(ConvertTourDto(tour), fileName);
         return Task.CompletedTask;
     }
 
     public Task GenerateSummaryReportAsync(List<TourDto> tours)
     {
-        string fileName = Path.Combine(_outputPath, $"Summary_{DateTime.Now:yyyyMMddHHmmss}.pdf");
+        QuestPDF.Settings.License = LicenseType.Community;
+        
+        string fileName = Path.Combine(AppContext.BaseDirectory, _outputPath, $"Summary_{DateTime.Now:yyyyMMddHHmmss}.pdf");
         Directory.CreateDirectory(_outputPath);
-
-        var entries = tours.Select(t => new SummaryEntryDto
+        
+        List<SummaryEntryDto> entries = tours.Select(t => new SummaryEntryDto
         {
             TourName = t.Name,
             AvgDistance = t.TourLogs.Any() ? t.TourLogs.Average(l => l.TotalDistance) : 0,
