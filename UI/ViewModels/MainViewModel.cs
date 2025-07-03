@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -35,14 +35,14 @@ public class MainViewModel : INotifyPropertyChanged
 
     public ObservableCollection<TourLogDto>? TourLogs => null; //TODO change /*SelectedTour.TourLogs;*/
 
-    private TourLogDto _selectedTourLog;  
+    private TourLogDto _selectedTourLog;
     public TourLogDto SelectedTourLog
     {
         get => _selectedTourLog;
         set
         {
             _selectedTourLog = value;
-            NotifyPropertyChanged(); 
+            NotifyPropertyChanged();
         }
     }
 
@@ -77,7 +77,7 @@ public class MainViewModel : INotifyPropertyChanged
         var removeToursWindow = new RemoveToursWindow(Tours);
         removeToursWindow.ShowDialog();
     }
-    private void AddTour(object parameter)
+    private async void AddTour(object parameter)
     {
         var addTourWindow = new AddTourWindow();
         if (addTourWindow.ShowDialog() == true)
@@ -90,20 +90,39 @@ public class MainViewModel : INotifyPropertyChanged
                 To = addTourWindow.To,
                 TransportType = addTourWindow.TransportType,
                 Distance = addTourWindow.Distance,
-                EstimatedTime = addTourWindow.EstimatedTime,
-                ImagePath = addTourWindow.ImagePath,
+                EstimatedTime = addTourWindow.EstimatedTime
             };
+
 
             var errors = newTour.Validate();
             if (errors.Count > 0)
             {
                 MessageBox.Show(string.Join("\n", errors), "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return; 
+                return;
             }
 
-            Tours.Add(newTour);
+            try
+            {
+                await _tourService.CreateTourAsync(newTour);
+
+                // Reload tours from DB to get updated list
+                var tours = await _tourService.GetAllToursAsync();
+                Tours.Clear();
+                foreach (var t in tours)
+                    Tours.Add(t);
+
+                NotifyPropertyChanged(nameof(Tours));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error creating tour: {ex.Message}");
+            }
         }
     }
+
+
+
+
 
 
     private void AddTourLog(object parameter)
@@ -126,7 +145,7 @@ public class MainViewModel : INotifyPropertyChanged
                 if (errors.Count > 0)
                 {
                     MessageBox.Show(string.Join("\n", errors), "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return; 
+                    return;
                 }
 
                 SelectedTour.TourLogs.Add(newLog);
@@ -141,8 +160,8 @@ public class MainViewModel : INotifyPropertyChanged
     {
         if (SelectedTour != null && SelectedTourLog != null)
         {
-            SelectedTour.TourLogs.Remove(SelectedTourLog); 
-            SelectedTourLog = null; 
+            SelectedTour.TourLogs.Remove(SelectedTourLog);
+            SelectedTourLog = null;
         }
     }
 

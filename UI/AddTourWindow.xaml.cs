@@ -5,54 +5,37 @@ namespace UI
 {
     public partial class AddTourWindow : Window
     {
-        public string TourName { get; private set; }
-        public string TourDescription { get; private set; }
-        public string From { get; private set; }
-        public string To { get; private set; }
-        public string TransportType { get; private set; }
-        public float Distance { get; private set; }
-        public TimeSpan EstimatedTime { get; private set; }
-        public string ImagePath { get; private set; }
+        public string TourName => NameTextBox.Text;
+        public string TourDescription => DescriptionTextBox.Text;
+        public string From => FromTextBox.Text;
+        public string To => ToTextBox.Text;
+        public float Distance => float.Parse(DistanceTextBox.Text);
+        public TimeSpan EstimatedTime => TimeSpan.Parse(TimeTextBox.Text);
+        public string TransportType => TransportTypeComboBox.Text;
+
 
         public AddTourWindow()
         {
             InitializeComponent();
-            TransportTypeComboBox.ItemsSource = new string[] { "Car", "Bike", "Walking", "Bus", "Train" };
+
+            // Fill TransportType combo box
+            TransportTypeComboBox.ItemsSource = new[] { "Car", "Bike", "Foot", "Train" };
         }
 
         private void Confirm_Click(object sender, RoutedEventArgs e)
         {
-            TourName = NameTextBox.Text;
-            TourDescription = DescriptionTextBox.Text;
-            From = FromTextBox.Text;
-            To = ToTextBox.Text;
-            TransportType = TransportTypeComboBox.SelectedItem?.ToString();
-            Distance = float.TryParse(DistanceTextBox.Text, out var dist) ? dist : 0;
-            EstimatedTime = TimeSpan.TryParse(TimeTextBox.Text, out var time) ? time : TimeSpan.Zero;
-            ImagePath = ImagePathTextBox.Text;
 
-            DialogResult = true;
-            Close();
+
+            this.DialogResult = true;
+            this.Close();
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = false;
-            Close();
+            this.DialogResult = false;
+            this.Close();
         }
 
-        private void SelectImage_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog
-            {
-                Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp",
-                Title = "Select Route Image"
-            };
 
-            if (openFileDialog.ShowDialog() == true)
-            {
-                ImagePathTextBox.Text = openFileDialog.FileName;
-            }
-        }
     }
 }
