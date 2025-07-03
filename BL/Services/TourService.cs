@@ -4,10 +4,11 @@ using BL.External;
 using BL.TourImage;
 using DAL.Models;
 using DAL.Repositories;
+using Microsoft.Extensions.Configuration;
 
 namespace BL.Services;
 
-public class TourService(ITourRepository repo, IRouteService routeService, IMapImageGenerator mapImageGenerator) : ITourService
+public class TourService(IConfiguration config, ITourRepository repo, IRouteService routeService, IMapImageGenerator mapImageGenerator) : ITourService
 {
     public async Task<List<TourDto>> GetAllToursAsync()
     {
@@ -50,16 +51,9 @@ public class TourService(ITourRepository repo, IRouteService routeService, IMapI
 
     public async Task CreateTourAsync(TourDto dto)
     {
-        //RouteResult route = await routeService.GetRouteAsync(dto.From, dto.To);
+        RouteResult route = await routeService.GetRouteAsync(dto.From, dto.To);
 
-        /*string imagesFolder = Path.Combine(AppContext.BaseDirectory, imageSettings.OutputFolder);
-        if (!Directory.Exists(imagesFolder))
-            Directory.CreateDirectory(imagesFolder);
-
-        string imageFileName = $"tour_{Guid.NewGuid()}.png";
-        string imageFullPath = Path.Combine(imagesFolder, imageFileName);
-
-        await mapImageGenerator.GenerateMapImageWithLeaflet(route, imageFullPath);*/
+        string imageFullPath = await mapImageGenerator.GenerateMapImageWithLeaflet(route);
 
         Tour tour = new()
         {
@@ -70,7 +64,7 @@ public class TourService(ITourRepository repo, IRouteService routeService, IMapI
             TransportType = dto.TransportType,
             Distance = dto.Distance,
             EstimatedTime = dto.EstimatedTime,
-            //ImagePath = imageFullPath
+            ImagePath = imageFullPath
         };
 
         await repo.AddTourAsync(tour);

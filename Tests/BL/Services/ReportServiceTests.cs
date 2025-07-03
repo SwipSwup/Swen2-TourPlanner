@@ -30,13 +30,13 @@ public class ReportServiceTests
     [TearDown]
     public void TearDown()
     {
-        if (Directory.Exists(_outputPath))
+        /*if (Directory.Exists(_outputPath))
         {
             foreach (var file in Directory.GetFiles(_outputPath, "*.pdf"))
             {
                 File.Delete(file);
             }
-        }
+        }*/
     }
 
     [Test]

@@ -1,14 +1,25 @@
 ﻿using System.Globalization;
+using Microsoft.Extensions.Configuration;
 using PuppeteerSharp;
 
 namespace BL.TourImage;
 
-public class MapImageGenerator : IMapImageGenerator
+public class MapImageGenerator(IConfiguration config) : IMapImageGenerator
 {
-    private readonly string _outputPath = config["ReportSettings:OutputDirectory"]
-                                          ?? throw new Exception("Missing ReportSettings:OutputDirectory");
-    
-    public async Task<string> GenerateMapImageWithLeaflet(RouteResult route, string outputPath)
+    private string OutputPath
+    {
+        get
+        {
+            string path = Path.Combine(AppContext.BaseDirectory,
+                config["TourImages:OutputDirectory"] ?? throw new Exception("Missing ReportSettings:OutputDirectory"));
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            return path;
+        }
+    }
+
+    public async Task<string> GenerateMapImageWithLeaflet(RouteResult route)
     {
         string template = await File.ReadAllTextAsync("Assets/MapTemplate.html");
 
@@ -23,18 +34,21 @@ public class MapImageGenerator : IMapImageGenerator
 
         try
         {
+            string imageFileName = $"map_{Guid.NewGuid()}.png";
+            string outputImagePath = Path.Combine(OutputPath, imageFileName);
+
             var browserFetcher = new BrowserFetcher();
             await browserFetcher.DownloadAsync();
 
             await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = true,
-                Args = new[] { "--no-sandbox", "--disable-setuid-sandbox" }
+                Args = ["--no-sandbox", "--disable-setuid-sandbox"]
             });
 
             await using var page = await browser.NewPageAsync();
 
-            var fileUri = new Uri(tempHtmlPath).AbsoluteUri;
+            string fileUri = new Uri(tempHtmlPath).AbsoluteUri;
             await page.GoToAsync(fileUri);
 
             await page.WaitForFunctionAsync("() => window.status === 'ready'", new WaitForFunctionOptions
@@ -42,9 +56,9 @@ public class MapImageGenerator : IMapImageGenerator
                 Timeout = 5000
             });
 
-            await page.ScreenshotAsync(outputPath, new ScreenshotOptions { FullPage = true });
+            await page.ScreenshotAsync(outputImagePath, new ScreenshotOptions { FullPage = true });
 
-            return outputPath;
+            return outputImagePath;
         }
         finally
         {

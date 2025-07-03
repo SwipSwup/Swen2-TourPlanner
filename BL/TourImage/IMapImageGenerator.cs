@@ -2,5 +2,5 @@
 
 public interface IMapImageGenerator
 {
-    Task<string> GenerateMapImageWithLeaflet(RouteResult route, string outputPath);
+    Task<string> GenerateMapImageWithLeaflet(RouteResult route);
 }
