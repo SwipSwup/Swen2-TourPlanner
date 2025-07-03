@@ -85,24 +85,26 @@
 
             </TabControl>
 
-            <!-- Tour Logs -->
             <GroupBox Header="Tour Logs" Grid.Row="2" Grid.Column="1">
                 <StackPanel>
                     <DataGrid x:Name="TourLogGrid" AutoGenerateColumns="False" ItemsSource="{Binding TourLogs}" SelectedItem="{Binding SelectedTourLog}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Date" Binding="{Binding Date}"/>
                             <DataGridTextColumn Header="Duration" Binding="{Binding Duration}"/>
-                            <DataGridTextColumn Header="Distance" Binding="{Binding Distance}"/>
+                            <DataGridTextColumn Header="Distance (km)" Binding="{Binding Distance}"/>
+                            <DataGridTextColumn Header="Difficulty" Binding="{Binding Difficulty}"/>
+                            <DataGridTextColumn Header="Rating" Binding="{Binding Rating}"/>
+                            <DataGridTextColumn Header="Comment" Binding="{Binding Comment}"/>
                         </DataGrid.Columns>
                     </DataGrid>
 
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Content="+" Width="30" Command="{Binding AddTourLogCommand}"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+                        <Button Content="+" Width="30" Command="{Binding AddTourLogCommand}" Margin="0,0,5,0"/>
                         <Button Content="-" Width="30" Command="{Binding RemoveTourLogCommand}"/>
                     </StackPanel>
-
                 </StackPanel>
             </GroupBox>
+
 
         </Grid>
     </Grid>
