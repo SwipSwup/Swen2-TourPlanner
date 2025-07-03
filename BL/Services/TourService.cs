@@ -1,11 +1,12 @@
-﻿using BL.DTOs;
+﻿using System.Text.Json;
+using BL.DTOs;
 using BL.External;
 using DAL.Models;
 using DAL.Repositories;
 
 namespace BL.Services;
 
-public class TourService(ITourRepository repo, IRouteService routeService)
+public class TourService(ITourRepository repo, IRouteService routeService) : ITourService
 {
     public async Task<List<TourDto>> GetAllToursAsync()
     {
@@ -64,6 +65,14 @@ public class TourService(ITourRepository repo, IRouteService routeService)
         await repo.AddTourAsync(tour);
     }
 
+    public async Task CreateToursAsync(List<TourDto> dtos)
+    {
+        foreach (TourDto dto in dtos)
+        {
+            await CreateTourAsync(dto);
+        }
+    }
+
     public async Task AddTourLogAsync(int tourId, TourLogDto logDto)
     {
         TourLog log = new()
@@ -114,5 +123,12 @@ public class TourService(ITourRepository repo, IRouteService routeService)
             TotalTime = l.TotalTime,
             Rating = l.Rating
         }).ToList();
+    }
+    public async Task ImportToursFromJsonAsync(string filePath)
+    {
+        string json = await File.ReadAllTextAsync(filePath);
+        var tours = JsonSerializer.Deserialize<List<TourDto>>(json);
+        if (tours != null)
+            await CreateToursAsync(tours);
     }
 }

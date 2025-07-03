@@ -35,7 +35,10 @@ namespace UI
                     services.AddScoped<ITourRepository, TourRepository>();
                     
                     services.AddScoped<IRouteService, RouteService>();
-                    services.AddScoped<TourService>();
+                    services.AddScoped<IReportService, ReportService>();
+                    services.AddScoped<ITourService, TourService>();
+                    
+                    
                     services.AddScoped<MainViewModel>();
                     
                 })
