@@ -5,7 +5,12 @@
     <Grid>
         <!-- Menu Bar -->
         <Menu VerticalAlignment="Top">
-            <MenuItem Header="File"/>
+            <MenuItem Header="File">
+                <MenuItem Header="Import Tour Data" Command="{Binding ImportToursCommand}" />
+                <MenuItem Header="Export All Tours" Command="{Binding ExportToursCommand}" />
+                <Separator/>
+                <MenuItem Header="Summary Report" Command="{Binding GenerateSummaryReportCommand}" />
+            </MenuItem>
             <MenuItem Header="Edit"/>
             <MenuItem Header="Options"/>
             <MenuItem Header="Help"/>
@@ -37,7 +42,7 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
 
-                    <!-- Buttons to Add/Delete Tours -->
+                    <!-- Buttons to Add/Delete/Edit Tours -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Content="+" Width="30" Command="{Binding AddTourCommand}"/>
                         <Button Content="-" Width="30" Command="{Binding OpenRemoveTourWindowCommand}"/>
@@ -71,6 +76,10 @@
 
                         <TextBlock Text="Estimated Time (hours):" Margin="0,10,0,0"/>
                         <TextBlock Text="{Binding SelectedTour.EstimatedTime}"/>
+
+                        <!-- New Generate Tour Report Button -->
+                        <Button Content="Generate Tour Report" Margin="0,10,0,0" Width="180"
+                                Command="{Binding GenerateTourReportCommand}"/>
                     </StackPanel>
                 </TabItem>
 
