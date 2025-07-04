@@ -42,7 +42,6 @@
                         <Button Content="+" Width="30" Command="{Binding AddTourCommand}"/>
                         <Button Content="-" Width="30" Command="{Binding OpenRemoveTourWindowCommand}"/>
                         <Button Content="..." Width="30" Command="{Binding OpenEditTourWindowCommand}" />
-
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
@@ -81,17 +80,19 @@
                         <Image x:Name="MapImage" Stretch="Fill" Source="{Binding SelectedTour.ImagePath}"/>
                     </Border>
                 </TabItem>
-
-
             </TabControl>
 
+            <!-- Tour Logs -->
             <GroupBox Header="Tour Logs" Grid.Row="2" Grid.Column="1">
                 <StackPanel>
-                    <DataGrid x:Name="TourLogGrid" AutoGenerateColumns="False" ItemsSource="{Binding TourLogs}" SelectedItem="{Binding SelectedTourLog}">
+                    <DataGrid x:Name="TourLogGrid"
+                              AutoGenerateColumns="False"
+                              ItemsSource="{Binding TourLogs}"
+                              SelectedItem="{Binding SelectedTourLog}">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Date" Binding="{Binding Date}"/>
-                            <DataGridTextColumn Header="Duration" Binding="{Binding Duration}"/>
-                            <DataGridTextColumn Header="Distance (km)" Binding="{Binding Distance}"/>
+                            <DataGridTextColumn Header="Date" Binding="{Binding DateTime, StringFormat=d}"/>
+                            <DataGridTextColumn Header="Duration" Binding="{Binding TotalTime}"/>
+                            <DataGridTextColumn Header="Distance (km)" Binding="{Binding TotalDistance}"/>
                             <DataGridTextColumn Header="Difficulty" Binding="{Binding Difficulty}"/>
                             <DataGridTextColumn Header="Rating" Binding="{Binding Rating}"/>
                             <DataGridTextColumn Header="Comment" Binding="{Binding Comment}"/>
@@ -104,8 +105,6 @@
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
-
-
         </Grid>
     </Grid>
 </Window>
