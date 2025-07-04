@@ -1,43 +1,81 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+    <title>Leaflet Map with Driving Route</title>
     <meta charset="utf-8" />
-    <title>Tour Map</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link
-            rel="stylesheet"
-            href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
-        html, body, #map { height: 100%; margin: 0; }
+        #map { height: 100vh; width: 100%; }
     </style>
 </head>
 <body>
+
 <div id="map"></div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-    const startLat = {{startLat}};
-    const startLon = {{startLon}};
-    const endLat = {{endLat}};
-    const endLon = {{endLon}};
+    // Replace these with real coordinates
+    const startLat = {{startLat}}; // e.g. 52.5200 for Berlin
+    const startLon = {{startLon}}; // e.g. 13.4050
+    const endLat = {{endLat}};     // e.g. 48.8566 for Paris
+    const endLon = {{endLon}};     // e.g. 2.3522
 
-    const map = L.map('map').setView([(startLat + endLat) / 2, (startLon + endLon) / 2], 10);
+    const map = L.map('map').setView([(startLat + endLat) / 2, (startLon + endLon) / 2], 5);
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
+        attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    L.marker([startLat, startLon]).addTo(map).bindPopup("Start").openPopup();
-    L.marker([endLat, endLon]).addTo(map).bindPopup("End");
+    L.marker([startLat, startLon]).addTo(map);
+    L.marker([endLat, endLon]).addTo(map);
 
-    const route = L.polyline([
-        [startLat, startLon],
-        [endLat, endLon]
-    ], {color: 'blue'}).addTo(map);
+    // OSRM API URL
+    const url = `https://router.project-osrm.org/route/v1/driving/${startLon},${startLat};${endLon},${endLat}?overview=full&geometries=geojson`;
 
-    setTimeout(() => {
-        window.status = "ready";
-    }, 1000); // Give map time to load
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (!data.routes || data.routes.length === 0) {
+                throw new Error("No route found.");
+            }
+
+            const route = data.routes[0].geometry;
+
+            const routeLine = L.geoJSON(route, {
+                style: {
+                    color: 'blue',
+                    weight: 4,
+                    opacity: 0.8
+                }
+            }).addTo(map);
+
+            map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+
+            window.status = "ready"
+        })
+        .catch(error => {
+            console.error('OSRM routing failed:', error);
+
+            // Fall back to straight line
+            const fallbackLine = L.polyline([
+                [startLat, startLon],
+                [endLat, endLon]
+            ], {
+                color: 'red',
+                weight: 2,
+                opacity: 0.5,
+                dashArray: '5, 5'
+            }).addTo(map);
+
+            map.fitBounds(fallbackLine.getBounds(), { padding: [50, 50] });
+
+            window.status = "ready"
+        });
 </script>
+
 </body>
 </html>

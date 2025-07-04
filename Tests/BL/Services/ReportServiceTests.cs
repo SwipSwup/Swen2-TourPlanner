@@ -1,5 +1,7 @@
 ﻿using BL.DTOs;
+using BL.External;
 using BL.Services;
+using BL.TourImage;
 using Microsoft.Extensions.Configuration;
 
 namespace Tests.BL.Services;
@@ -8,50 +10,57 @@ namespace Tests.BL.Services;
 public class ReportServiceTests
 {
     private string _outputPath = null!;
-    private IReportService _service = null!;
+    private IReportService _reportService = null!;
+    private ITourService _tourService = null!;
+    private IRouteService _routeService = null!;
+    private IMapImageGenerator _imageGenerator = null!;
 
     [SetUp]
     public void Setup()
     {
-        _outputPath = Path.Combine("TourPlannerReportTests");
-
+        _outputPath = "TourPlannerReportTests";
+        
         Dictionary<string, string> settings = new Dictionary<string, string>
         {
-            { "ReportSettings:OutputDirectory", _outputPath }
+            { "ReportSettings:OutputDirectory", _outputPath },
+            { "TourImages:OutputDirectory", _outputPath }
         };
 
         IConfiguration config = new ConfigurationBuilder()
             .AddInMemoryCollection(settings)
             .Build();
 
-        _service = new ReportService(config);
+        _imageGenerator = new MapImageGenerator(config);
+
+        _reportService = new ReportService(config);
+        _routeService = new RouteService();
     }
 
     [TearDown]
     public void TearDown()
     {
-        /*if (Directory.Exists(_outputPath))
+        if (Directory.Exists(_outputPath))
         {
-            foreach (var file in Directory.GetFiles(_outputPath, "*.pdf"))
+            foreach (var file in Directory.GetFiles(_outputPath))
             {
                 File.Delete(file);
             }
-        }*/
+        }
     }
 
     [Test]
     public async Task GenerateTourReport_CreatesPdfFile()
     {
-        /*var tour = new TourDto
+        var tour = new TourDto
         {
             Name = "TestTour",
             Description = "Testing tour generation",
             From = "Vienna",
-            To = "Salzburg",
+            To = "London",
             TransportType = "Train",
             Distance = 300,
             EstimatedTime = TimeSpan.FromHours(3),
-            ImagePath = "", // Skip image
+            ImagePath = "", 
             TourLogs = new List<TourLogDto>
             {
                 new()
@@ -64,12 +73,15 @@ public class ReportServiceTests
                     Rating = 5
                 }
             }
-        };*/
+        };
         
-       // var tour = _service. 
+        RouteResult route = await _routeService.GetRouteAsync(tour.From, tour.To);
 
-        //await _service.GenerateTourReportAsync(tour);
-
+        string imageFullPath = await _imageGenerator.GenerateMapImageWithLeaflet(route);
+        tour.ImagePath = imageFullPath;
+        
+        await _reportService.GenerateTourReportAsync(tour);
+        
         string[] files = Directory.GetFiles(_outputPath, "Tour_TestTour_*.pdf");
         
         Assert.That(files, Is.Not.Empty);
@@ -96,9 +108,11 @@ public class ReportServiceTests
             }
         };
 
-        await _service.GenerateSummaryReportAsync(tours);
+        await _reportService.GenerateSummaryReportAsync(tours);
 
         string[] files = Directory.GetFiles(_outputPath, "Summary_*.pdf");
         Assert.That(files, Is.Not.Empty);
     }
+    
+    
 }

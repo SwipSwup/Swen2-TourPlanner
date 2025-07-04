@@ -27,7 +27,8 @@ public class RouteService : IRouteService
         {
             coordinates = new[]
             {
-                new[] { startCoords.Longitude, startCoords.Latitude }, new[] { endCoords.Longitude, endCoords.Latitude }
+                new[] { startCoords.Longitude, startCoords.Latitude },
+                new[] { endCoords.Longitude, endCoords.Latitude }
             }
         };
 
@@ -42,8 +43,9 @@ public class RouteService : IRouteService
         string json = await response.Content.ReadAsStringAsync();
 
         using JsonDocument doc = JsonDocument.Parse(json);
-        JsonElement summary = doc.RootElement.GetProperty("features")[0]
-            .GetProperty("properties").GetProperty("summary");
+
+        JsonElement summary = doc.RootElement.GetProperty("routes")[0]
+            .GetProperty("summary");
 
         float distance = (float)summary.GetProperty("distance").GetDouble() / 1000;
         TimeSpan duration = TimeSpan.FromSeconds(summary.GetProperty("duration").GetDouble());
@@ -58,6 +60,7 @@ public class RouteService : IRouteService
             EndLongitude = endCoords.Longitude
         };
     }
+
 
     private async Task<Coordinate?> GeocodeAsync(string location)
     {

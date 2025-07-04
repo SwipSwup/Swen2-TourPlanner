@@ -1,7 +1,10 @@
 ﻿using System.Globalization;
 using System.Net;
+using System.Net.Mime;
 using System.Text;
 using BL.External;
+using BL.TourImage;
+using Microsoft.Extensions.Configuration;
 
 namespace Tests.BL.External
 {
@@ -16,7 +19,7 @@ namespace Tests.BL.External
         {
             _mockHandler = new MockHttpMessageHandler();
             _mockHttpClient = new HttpClient(_mockHandler);
-        }
+        }   
 
         [TearDown]
         public void TearDown()
@@ -46,6 +49,8 @@ namespace Tests.BL.External
             Assert.That(result.EstimatedTime, Is.EqualTo(TimeSpan.FromHours(2)));
         }
     }
+    
+    
 
     public class MockHttpMessageHandler : HttpMessageHandler
     {
@@ -71,19 +76,19 @@ namespace Tests.BL.External
         {
             string json = $@"
     {{
-        ""features"": [
+        ""routes"": [
             {{
-                ""properties"": {{
-                    ""summary"": {{
-                        ""distance"": {distanceMeters.ToString(CultureInfo.InvariantCulture)},
-                        ""duration"": {durationSeconds.ToString(CultureInfo.InvariantCulture)}
-                    }}
+                ""summary"": {{
+                    ""distance"": {distanceMeters.ToString(CultureInfo.InvariantCulture)},
+                    ""duration"": {durationSeconds.ToString(CultureInfo.InvariantCulture)}
                 }}
             }}
         ]
     }}";
             _responses.Enqueue(CreateResponse(json));
         }
+        
+        
 
 
         private HttpResponseMessage CreateResponse(string content)
@@ -102,4 +107,6 @@ namespace Tests.BL.External
             return Task.FromResult(_responses.Dequeue());
         }
     }
+    
+    
 }
