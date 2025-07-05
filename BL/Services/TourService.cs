@@ -95,7 +95,9 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
     }
     public async Task UpdateTourAsync(TourDto dto)
     {
-
+        RouteResult route = await routeService.GetRouteAsync(dto.From, dto.To);
+        
+        string imageFullPath = await mapImageGenerator.GenerateMapImageWithLeaflet(route);
 
         var tour = new Tour
         {
@@ -105,9 +107,9 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
             From = dto.From,
             To = dto.To,
             TransportType = dto.TransportType,
-            Distance = dto.Distance,
-            EstimatedTime = dto.EstimatedTime,
-            ImagePath = dto.ImagePath
+            Distance = route.Distance,
+            EstimatedTime = route.EstimatedTime,
+            ImagePath = imageFullPath
         };
 
         await repo.UpdateTourAsync(tour);
