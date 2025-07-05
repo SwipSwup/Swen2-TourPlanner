@@ -137,7 +137,6 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
 
     public async Task DeleteTourAsync(int tourId)
     {
-        Console.WriteLine("Deleting tour", tourId);
         await repo.DeleteTourAsync(tourId);
     }
 
