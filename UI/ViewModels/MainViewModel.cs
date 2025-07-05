@@ -136,10 +136,49 @@ namespace UI.ViewModels
             }
         }
 
-        private void AddTourLog()
+        private async void AddTourLog()
         {
-            // To be implemented if needed.
+            if (SelectedTour == null)
+            {
+                MessageBox.Show("Please select a tour first.", "No Tour Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var addLogWindow = new AddTourLogWindow();
+            bool? result = addLogWindow.ShowDialog();
+            if (result == true)
+            {
+                var newLog = new TourLogDto
+                {
+                    Comment = addLogWindow.Comment,
+                    DateTime = addLogWindow.Date,
+                    Difficulty = addLogWindow.Difficulty,
+                    TotalDistance = addLogWindow.TotalDistance,
+                    TotalTime = addLogWindow.Duration,
+                    Rating = addLogWindow.Rating
+                };
+
+                try
+                {
+                    await _tourService.AddTourLogAsync(SelectedTour.Id, newLog);
+
+                    // Reload tours or just refresh logs for the selected tour
+                    var updatedTour = (await _tourService.GetAllToursAsync())
+                        .FirstOrDefault(t => t.Id == SelectedTour.Id);
+
+                    if (updatedTour != null)
+                    {
+                        SelectedTour.TourLogs = updatedTour.TourLogs;
+                        NotifyPropertyChanged(nameof(TourLogs));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error adding tour log: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
+
 
         private void RemoveTourLog()
         {
