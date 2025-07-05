@@ -52,7 +52,7 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
     public async Task CreateTourAsync(TourDto dto)
     {
         RouteResult route = await routeService.GetRouteAsync(dto.From, dto.To);
-
+        
         string imageFullPath = await mapImageGenerator.GenerateMapImageWithLeaflet(route);
 
         Tour tour = new()
@@ -62,8 +62,8 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
             From = dto.From,
             To = dto.To,
             TransportType = dto.TransportType,
-            Distance = dto.Distance,
-            EstimatedTime = dto.EstimatedTime,
+            Distance = route.Distance,
+            EstimatedTime = route.EstimatedTime,
             ImagePath = imageFullPath
         };
 
@@ -95,7 +95,9 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
     }
     public async Task UpdateTourAsync(TourDto dto)
     {
-
+        RouteResult route = await routeService.GetRouteAsync(dto.From, dto.To);
+        
+        string imageFullPath = await mapImageGenerator.GenerateMapImageWithLeaflet(route);
 
         var tour = new Tour
         {
@@ -105,9 +107,9 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
             From = dto.From,
             To = dto.To,
             TransportType = dto.TransportType,
-            Distance = dto.Distance,
-            EstimatedTime = dto.EstimatedTime,
-            ImagePath = dto.ImagePath
+            Distance = route.Distance,
+            EstimatedTime = route.EstimatedTime,
+            ImagePath = imageFullPath
         };
 
         await repo.UpdateTourAsync(tour);
@@ -135,7 +137,6 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
 
     public async Task DeleteTourAsync(int tourId)
     {
-        Console.WriteLine("Deleting tour", tourId);
         await repo.DeleteTourAsync(tourId);
     }
 

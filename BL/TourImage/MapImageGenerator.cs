@@ -41,7 +41,7 @@ public class MapImageGenerator(IConfiguration config) : IMapImageGenerator
                 return null;
             }
 
-            Directory.CreateDirectory(OutputPath); // Ensure the output directory exists
+            Directory.CreateDirectory(OutputPath); 
 
             string imageFileName = $"map_{Guid.NewGuid()}.png";
             string outputImagePath = Path.Combine(OutputPath, imageFileName);
@@ -58,11 +58,9 @@ public class MapImageGenerator(IConfiguration config) : IMapImageGenerator
             await using var page = await browser.NewPageAsync();
 
             string fileUri = new Uri(tempHtmlPath).AbsoluteUri;
-            //Console.WriteLine($"Opening map file: {fileUri}");
 
             await page.GoToAsync(fileUri, WaitUntilNavigation.Networkidle2);
 
-            // Wait for leaflet to finish rendering (set this in your JS with: window.status = 'ready')
             try
             {
                 await page.WaitForFunctionAsync("() => window.status === 'ready'", new WaitForFunctionOptions
