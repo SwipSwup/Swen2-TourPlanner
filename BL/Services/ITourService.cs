@@ -8,6 +8,7 @@ public interface ITourService
     Task CreateTourAsync(TourDto dto);
     Task CreateToursAsync(List<TourDto> dtos);
     Task AddTourLogAsync(int tourId, TourLogDto logDto);
+    Task UpdateTourAsync(TourDto dto);
     Task UpdateTourLogAsync(TourLogDto logDto);
     Task DeleteTourAsync(int tourId);
     Task DeleteTourLogAsync(int logId);

@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using BL.DTOs;
 using Microsoft.Win32;
 
@@ -11,19 +12,32 @@ namespace UI
         public EditTourWindow(TourDto selectedTour)
         {
             InitializeComponent();
-            EditedTour = selectedTour;
 
-            // Pre-fill data in the UI elements
+            // Make a **copy** to avoid direct editing of the original until confirmed
+            EditedTour = new TourDto
+            {
+                Id = selectedTour.Id,
+                Name = selectedTour.Name,
+                Description = selectedTour.Description,
+                From = selectedTour.From,
+                To = selectedTour.To,
+                TransportType = selectedTour.TransportType,
+                Distance = selectedTour.Distance,
+                EstimatedTime = selectedTour.EstimatedTime,
+                ImagePath = selectedTour.ImagePath,
+                TourLogs = selectedTour.TourLogs
+            };
+
+            // Pre-fill fields
             NameTextBox.Text = EditedTour.Name;
             DescriptionTextBox.Text = EditedTour.Description;
             FromTextBox.Text = EditedTour.From;
             ToTextBox.Text = EditedTour.To;
+            TransportTypeComboBox.ItemsSource = new string[] { "Car", "Bike", "Foot", "Train" };
             TransportTypeComboBox.SelectedItem = EditedTour.TransportType;
             DistanceTextBox.Text = EditedTour.Distance.ToString();
             TimeTextBox.Text = EditedTour.EstimatedTime.ToString();
             ImagePathTextBox.Text = EditedTour.ImagePath;
-
-            TransportTypeComboBox.ItemsSource = new string[] { "Car", "Bike", "Walking", "Bus", "Train" };
         }
 
         private void Confirm_Click(object sender, RoutedEventArgs e)
@@ -36,18 +50,17 @@ namespace UI
             EditedTour.Distance = float.TryParse(DistanceTextBox.Text, out var dist) ? dist : 0;
             EditedTour.EstimatedTime = TimeSpan.TryParse(TimeTextBox.Text, out var time) ? time : TimeSpan.Zero;
             EditedTour.ImagePath = ImagePathTextBox.Text;
-            
+
             var errors = EditedTour.Validate();
             if (errors.Count > 0)
             {
                 MessageBox.Show(string.Join("\n", errors), "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return; 
+                return;
             }
 
             DialogResult = true;
             Close();
         }
-
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {

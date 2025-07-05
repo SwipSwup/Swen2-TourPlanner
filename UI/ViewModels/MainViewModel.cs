@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
@@ -137,7 +138,7 @@ namespace UI.ViewModels
 
         private void AddTourLog()
         {
-            // Implementation for adding a tour log.
+            // To be implemented if needed.
         }
 
         private void RemoveTourLog()
@@ -150,27 +151,33 @@ namespace UI.ViewModels
             }
         }
 
-        private void OpenEditTourWindow()
+        private async void OpenEditTourWindow()
         {
             if (SelectedTour != null)
             {
                 var editTourWindow = new EditTourWindow(SelectedTour);
                 if (editTourWindow.ShowDialog() == true)
                 {
-                    NotifyPropertyChanged(nameof(Tours));
-                    NotifyPropertyChanged(nameof(SelectedTour));
-                    NotifyPropertyChanged(nameof(TourLogs));
+                    try
+                    {
+                        await _tourService.UpdateTourAsync(editTourWindow.EditedTour);
+                        await LoadToursAsync();
+
+                        SelectedTour = Tours.FirstOrDefault(t => t.Id == editTourWindow.EditedTour.Id);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error updating tour: {ex.Message}", "Update Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             }
         }
 
         private void OpenRemoveTourWindow()
         {
-            // Pass Tours collection and tourService to the window
             var removeWindow = new RemoveToursWindow(Tours, _tourService);
             if (removeWindow.ShowDialog() == true)
             {
-                // Refresh tours after removal
                 _ = LoadToursAsync();
             }
         }

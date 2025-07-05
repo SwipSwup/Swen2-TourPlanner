@@ -16,6 +16,7 @@ public interface ITourRepository
     Task UpdateTourLogAsync(TourLog log);
     Task DeleteTourLogAsync(int logId);
 
+
     Task<int> GetTourPopularityAsync(int tourId);
     Task<bool> IsChildFriendlyAsync(int tourId);
 }

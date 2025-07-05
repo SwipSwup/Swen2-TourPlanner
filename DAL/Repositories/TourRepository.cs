@@ -17,11 +17,30 @@ public class TourRepository(TourPlannerContext context) : ITourRepository
         await context.SaveChangesAsync();
     }
 
-    public async Task UpdateTourAsync(Tour tour)
+    public async Task UpdateTourAsync(Tour updatedTour)
     {
-        context.Tours.Update(tour);
-        await context.SaveChangesAsync();
+
+        var existingTour = await context.Tours.FindAsync(updatedTour.Id);
+
+        if (existingTour != null)
+        {
+            existingTour.Name = updatedTour.Name;
+            existingTour.Description = updatedTour.Description;
+            existingTour.From = updatedTour.From;
+            existingTour.To = updatedTour.To;
+            existingTour.TransportType = updatedTour.TransportType;
+            existingTour.Distance = updatedTour.Distance;
+            existingTour.EstimatedTime = updatedTour.EstimatedTime;
+            existingTour.ImagePath = updatedTour.ImagePath;
+
+            await context.SaveChangesAsync();
+        }
+        else
+        {
+            throw new Exception($"Tour with ID {updatedTour.Id} not found.");
+        }
     }
+
 
     public async Task DeleteTourAsync(int id)
     {

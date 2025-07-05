@@ -93,7 +93,25 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
 
         await repo.AddTourLogAsync(log);
     }
+    public async Task UpdateTourAsync(TourDto dto)
+    {
 
+
+        var tour = new Tour
+        {
+            Id = dto.Id,
+            Name = dto.Name,
+            Description = dto.Description,
+            From = dto.From,
+            To = dto.To,
+            TransportType = dto.TransportType,
+            Distance = dto.Distance,
+            EstimatedTime = dto.EstimatedTime,
+            ImagePath = dto.ImagePath
+        };
+
+        await repo.UpdateTourAsync(tour);
+    }
     public async Task UpdateTourLogAsync(TourLogDto logDto)
     {
         TourLog log = new()
