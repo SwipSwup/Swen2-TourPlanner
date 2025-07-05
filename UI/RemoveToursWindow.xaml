@@ -6,7 +6,7 @@
         <StackPanel>
             <TextBlock Text="Select tours to remove:" Margin="0,0,0,10" FontWeight="Bold"/>
 
-            <ListBox x:Name="TourListBox" Height="250">
+            <ListBox x:Name="TourListBox" Height="250" ItemsSource="{Binding Tours}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">

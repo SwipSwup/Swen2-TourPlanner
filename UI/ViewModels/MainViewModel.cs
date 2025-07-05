@@ -1,9 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Runtime.CompilerServices;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -44,7 +42,6 @@ namespace UI.ViewModels
                     NotifyPropertyChanged();
                     NotifyPropertyChanged(nameof(TourLogs));
 
-                    // Notify command that depends on SelectedTour
                     GenerateTourReportCommand?.RaiseCanExecuteChanged();
                 }
             }
@@ -52,7 +49,7 @@ namespace UI.ViewModels
 
         public ObservableCollection<TourLogDto>? TourLogs =>
             SelectedTour != null
-                ? new ObservableCollection<TourLogDto>(SelectedTour.TourLogs ?? new List<TourLogDto>())
+                ? new ObservableCollection<TourLogDto>(SelectedTour.TourLogs ?? new System.Collections.Generic.List<TourLogDto>())
                 : null;
 
         private TourLogDto? _selectedTourLog;
@@ -169,8 +166,13 @@ namespace UI.ViewModels
 
         private void OpenRemoveTourWindow()
         {
-            var removeToursWindow = new RemoveToursWindow(Tours);
-            removeToursWindow.ShowDialog();
+            // Pass Tours collection and tourService to the window
+            var removeWindow = new RemoveToursWindow(Tours, _tourService);
+            if (removeWindow.ShowDialog() == true)
+            {
+                // Refresh tours after removal
+                _ = LoadToursAsync();
+            }
         }
 
         private async Task ImportToursAsync()
@@ -208,8 +210,8 @@ namespace UI.ViewModels
                 try
                 {
                     var allTours = await _tourService.GetAllToursAsync();
-                    var json = JsonSerializer.Serialize(allTours, new JsonSerializerOptions { WriteIndented = true });
-                    await File.WriteAllTextAsync(dlg.FileName, json);
+                    var json = System.Text.Json.JsonSerializer.Serialize(allTours, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+                    await System.IO.File.WriteAllTextAsync(dlg.FileName, json);
                     MessageBox.Show("Tours exported successfully.");
                 }
                 catch (Exception ex)

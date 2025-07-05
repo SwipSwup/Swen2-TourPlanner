@@ -26,6 +26,7 @@ public class TourRepository(TourPlannerContext context) : ITourRepository
     public async Task DeleteTourAsync(int id)
     {
         Tour? tour = await context.Tours.FindAsync(id);
+        Console.WriteLine("TEST");
         if (tour is null) return;
 
         context.Tours.Remove(tour);

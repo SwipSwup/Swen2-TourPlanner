@@ -115,6 +115,13 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
         await repo.DeleteTourLogAsync(logId);
     }
 
+    public async Task DeleteTourAsync(int tourId)
+    {
+        Console.WriteLine("Deleting tour", tourId);
+        await repo.DeleteTourAsync(tourId);
+    }
+
+
     public async Task<List<TourLogDto>> GetLogsForTourAsync(int tourId)
     {
         var logs = await repo.GetLogsForTourAsync(tourId);
