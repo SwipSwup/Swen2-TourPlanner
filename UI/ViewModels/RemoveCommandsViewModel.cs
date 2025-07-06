@@ -1,11 +1,15 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Windows.Input;
 using UI.Commands;
 using BL.Services;
+using log4net;
 
 namespace UI.ViewModels;
 
 public class RemoveCommandsViewModel
 {
+    private static readonly ILog Log = LogManager.GetLogger(typeof(RemoveCommandsViewModel));
+
     private readonly AddTourViewModel _viewModel;
     private readonly ITourService _tourService;
 
@@ -35,11 +39,25 @@ public class RemoveCommandsViewModel
         if (_viewModel.SelectedTour != null)
         {
             var tourToRemove = _viewModel.SelectedTour;
+            Log.Info($"Attempting to remove tour with ID: {tourToRemove.Id}, Name: {tourToRemove.Name}");
 
-            await _tourService.DeleteTourAsync(tourToRemove.Id);
+            try
+            {
+                await _tourService.DeleteTourAsync(tourToRemove.Id);
 
-            _viewModel.Tours.Remove(tourToRemove);
-            _viewModel.SelectedTour = null;
+                _viewModel.Tours.Remove(tourToRemove);
+                _viewModel.SelectedTour = null;
+
+                Log.Info($"Successfully removed tour with ID: {tourToRemove.Id}");
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error while removing tour with ID: {tourToRemove.Id}", ex);
+            }
+        }
+        else
+        {
+            Log.Warn("RemoveTour was called but SelectedTour was null.");
         }
     }
 }

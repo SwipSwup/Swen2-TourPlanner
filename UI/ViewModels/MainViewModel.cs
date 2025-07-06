@@ -11,11 +11,13 @@ using BL.Services;
 using Microsoft.Win32;
 using UI.Commands;
 using UI.Views;
+using log4net;
 
 namespace UI.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(MainViewModel));
         private readonly ITourService _tourService;
         private readonly IReportService _reportService;
 
@@ -104,22 +106,22 @@ namespace UI.ViewModels
             ImportToursCommand = new RelayCommand(async _ => await ImportToursAsync());
             ExportToursCommand = new RelayCommand(async _ => await ExportToursAsync());
             GenerateSummaryReportCommand = new RelayCommand(async _ => await GenerateSummaryReportAsync());
-            GenerateTourReportCommand = new RelayCommand(
-                async _ => await GenerateTourReportAsync(),
-                _ => SelectedTour != null
-            );
+            GenerateTourReportCommand = new RelayCommand(async _ => await GenerateTourReportAsync(), _ => SelectedTour != null);
+
+            AddRandomTourCommand = new RelayCommand(async _ => await AddRandomTour());
 
             _ = LoadToursAsync();
         }
 
         private async Task LoadToursAsync()
         {
+            log.Info("Loading tours...");
             var tours = await _tourService.GetAllToursAsync();
             Tours.Clear();
             foreach (var t in tours)
                 Tours.Add(t);
-
             NotifyPropertyChanged(nameof(Tours));
+            log.Info("Tours loaded successfully.");
         }
 
         private async Task AddTour()
@@ -146,10 +148,12 @@ namespace UI.ViewModels
                 try
                 {
                     await _tourService.CreateTourAsync(newTour);
+                    log.Info($"Created tour '{newTour.Name}'");
                     await LoadToursAsync();
                 }
                 catch (Exception ex)
                 {
+                    log.Error("Error creating tour", ex);
                     MessageBox.Show($"Error creating tour: {ex.Message}");
                 }
             }
@@ -162,9 +166,7 @@ namespace UI.ViewModels
             {
                 var random = new Random();
                 string randomDestination = EuropeanCities[random.Next(EuropeanCities.Count)];
-
                 string name = $"{window.From} to {randomDestination}";
-
                 string finalDescription = $"{window.UserDescription?.Trim()}\nThis is a trip from {window.From} to {randomDestination}.";
 
                 var newTour = new TourDto
@@ -179,10 +181,12 @@ namespace UI.ViewModels
                 try
                 {
                     await _tourService.CreateTourAsync(newTour);
+                    log.Info($"Random tour added: {name}");
                     await LoadToursAsync();
                 }
                 catch (Exception ex)
                 {
+                    log.Error("Error adding random tour", ex);
                     MessageBox.Show($"Error adding random tour: {ex.Message}");
                 }
             }
@@ -197,8 +201,7 @@ namespace UI.ViewModels
             }
 
             var addLogWindow = new AddTourLogWindow();
-            bool? result = addLogWindow.ShowDialog();
-            if (result == true)
+            if (addLogWindow.ShowDialog() == true)
             {
                 var newLog = new TourLogDto
                 {
@@ -213,11 +216,10 @@ namespace UI.ViewModels
                 try
                 {
                     await _tourService.AddTourLogAsync(SelectedTour.Id, newLog);
+                    log.Info($"Added log to tour '{SelectedTour.Name}'");
 
-                    // Refresh logs for the selected tour
                     var updatedTour = (await _tourService.GetAllToursAsync())
                         .FirstOrDefault(t => t.Id == SelectedTour.Id);
-
                     if (updatedTour != null)
                     {
                         SelectedTour.TourLogs = updatedTour.TourLogs;
@@ -226,6 +228,7 @@ namespace UI.ViewModels
                 }
                 catch (Exception ex)
                 {
+                    log.Error("Error adding tour log", ex);
                     MessageBox.Show($"Error adding tour log: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
@@ -237,11 +240,8 @@ namespace UI.ViewModels
                 return;
 
             var editLogWindow = new EditTourLogWindow(SelectedTourLog);
-            bool? result = editLogWindow.ShowDialog();
-
-            if (result == true)
+            if (editLogWindow.ShowDialog() == true)
             {
-                // Update SelectedTourLog properties from window
                 SelectedTourLog.DateTime = editLogWindow.Date;
                 SelectedTourLog.TotalTime = editLogWindow.Duration;
                 SelectedTourLog.TotalDistance = editLogWindow.TotalDistance;
@@ -252,11 +252,10 @@ namespace UI.ViewModels
                 try
                 {
                     await _tourService.UpdateTourLogAsync(SelectedTourLog);
+                    log.Info($"Updated log for tour '{SelectedTour?.Name}'");
 
-                    // Refresh logs for the selected tour after update
                     var updatedTour = (await _tourService.GetAllToursAsync())
                         .FirstOrDefault(t => t.Id == SelectedTour.Id);
-
                     if (updatedTour != null)
                     {
                         SelectedTour.TourLogs = updatedTour.TourLogs;
@@ -265,6 +264,7 @@ namespace UI.ViewModels
                 }
                 catch (Exception ex)
                 {
+                    log.Error("Error updating tour log", ex);
                     MessageBox.Show($"Error updating tour log: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
@@ -278,44 +278,42 @@ namespace UI.ViewModels
                 return;
             }
 
-            var result = MessageBox.Show("Are you sure you want to delete the selected tour log?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            if (result != MessageBoxResult.Yes)
+            if (MessageBox.Show("Are you sure you want to delete the selected tour log?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                 return;
 
             try
             {
                 await _tourService.DeleteTourLogAsync(SelectedTourLog.Id);
-
-                // Remove from local collection
                 SelectedTour.TourLogs.Remove(SelectedTourLog);
+                log.Info($"Deleted tour log from tour '{SelectedTour.Name}'");
                 SelectedTourLog = null;
-
                 NotifyPropertyChanged(nameof(TourLogs));
             }
             catch (Exception ex)
             {
+                log.Error("Error deleting tour log", ex);
                 MessageBox.Show($"Error deleting tour log: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private async void OpenEditTourWindow()
         {
-            if (SelectedTour != null)
-            {
-                var editTourWindow = new EditTourWindow(SelectedTour);
-                if (editTourWindow.ShowDialog() == true)
-                {
-                    try
-                    {
-                        await _tourService.UpdateTourAsync(editTourWindow.EditedTour);
-                        await LoadToursAsync();
+            if (SelectedTour == null) return;
 
-                        SelectedTour = Tours.FirstOrDefault(t => t.Id == editTourWindow.EditedTour.Id);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error updating tour: {ex.Message}", "Update Failed", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+            var editTourWindow = new EditTourWindow(SelectedTour);
+            if (editTourWindow.ShowDialog() == true)
+            {
+                try
+                {
+                    await _tourService.UpdateTourAsync(editTourWindow.EditedTour);
+                    log.Info($"Updated tour: {editTourWindow.EditedTour.Name}");
+                    await LoadToursAsync();
+                    SelectedTour = Tours.FirstOrDefault(t => t.Id == editTourWindow.EditedTour.Id);
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Error updating tour", ex);
+                    MessageBox.Show($"Error updating tour: {ex.Message}", "Update Failed", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -325,27 +323,26 @@ namespace UI.ViewModels
             var removeWindow = new RemoveToursWindow(Tours, _tourService);
             if (removeWindow.ShowDialog() == true)
             {
+                log.Info("Removed one or more tours.");
                 _ = LoadToursAsync();
             }
         }
 
         private async Task ImportToursAsync()
         {
-            var dlg = new OpenFileDialog
-            {
-                Filter = "JSON files (*.json)|*.json",
-                Title = "Import Tours from JSON"
-            };
+            var dlg = new OpenFileDialog { Filter = "JSON files (*.json)|*.json", Title = "Import Tours from JSON" };
             if (dlg.ShowDialog() == true)
             {
                 try
                 {
                     await _tourService.ImportToursFromJsonAsync(dlg.FileName);
+                    log.Info($"Imported tours from file: {dlg.FileName}");
                     await LoadToursAsync();
                     MessageBox.Show("Tours imported successfully.");
                 }
                 catch (Exception ex)
                 {
+                    log.Error("Error importing tours", ex);
                     MessageBox.Show($"Error importing tours: {ex.Message}");
                 }
             }
@@ -366,10 +363,12 @@ namespace UI.ViewModels
                     var allTours = await _tourService.GetAllToursAsync();
                     var json = System.Text.Json.JsonSerializer.Serialize(allTours, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
                     await System.IO.File.WriteAllTextAsync(dlg.FileName, json);
+                    log.Info($"Exported tours to file: {dlg.FileName}");
                     MessageBox.Show("Tours exported successfully.");
                 }
                 catch (Exception ex)
                 {
+                    log.Error("Error exporting tours", ex);
                     MessageBox.Show($"Error exporting tours: {ex.Message}");
                 }
             }
@@ -381,10 +380,12 @@ namespace UI.ViewModels
             {
                 var allTours = await _tourService.GetAllToursAsync();
                 await _reportService.GenerateSummaryReportAsync(allTours);
+                log.Info("Generated summary report.");
                 MessageBox.Show("Summary report generated.");
             }
             catch (Exception ex)
             {
+                log.Error("Error generating summary report", ex);
                 MessageBox.Show($"Error generating summary report: {ex.Message}");
             }
         }
@@ -396,10 +397,12 @@ namespace UI.ViewModels
             try
             {
                 await _reportService.GenerateTourReportAsync(SelectedTour);
+                log.Info($"Generated tour report for {SelectedTour.Name}");
                 MessageBox.Show($"Tour report generated for {SelectedTour.Name}.");
             }
             catch (Exception ex)
             {
+                log.Error("Error generating tour report", ex);
                 MessageBox.Show($"Error generating tour report: {ex.Message}");
             }
         }

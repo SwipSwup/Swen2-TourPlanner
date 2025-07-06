@@ -2,17 +2,22 @@
 using System.Windows;
 using BL.DTOs;
 using Microsoft.Win32;
+using log4net;
+using System.Reflection;
 
 namespace UI
 {
     public partial class EditTourWindow : Window
     {
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         public TourDto EditedTour { get; private set; }
 
         public EditTourWindow(TourDto selectedTour)
         {
             InitializeComponent();
 
+            log.Info("Initializing EditTourWindow.");
 
             EditedTour = new TourDto
             {
@@ -36,6 +41,7 @@ namespace UI
             TransportTypeComboBox.ItemsSource = new string[] { "Car", "Bike", "Foot", "Train" };
             TransportTypeComboBox.SelectedItem = EditedTour.TransportType;
 
+            log.Info($"Loaded tour for editing: Id={EditedTour.Id}, Name={EditedTour.Name}");
         }
 
         private void Confirm_Click(object sender, RoutedEventArgs e)
@@ -46,24 +52,26 @@ namespace UI
             EditedTour.To = ToTextBox.Text;
             EditedTour.TransportType = TransportTypeComboBox.SelectedItem?.ToString();
 
-
             var errors = EditedTour.Validate();
+
             if (errors.Count > 0)
             {
-                MessageBox.Show(string.Join("\n", errors), "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                string errorMessage = string.Join("\n", errors);
+                log.Warn($"Validation failed on Confirm: {errorMessage}");
+                MessageBox.Show(errorMessage, "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
+            log.Info($"Tour confirmed for saving: Id={EditedTour.Id}, Name={EditedTour.Name}");
             DialogResult = true;
             Close();
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
+            log.Info("EditTourWindow canceled by user.");
             DialogResult = false;
             Close();
         }
-
-
     }
 }

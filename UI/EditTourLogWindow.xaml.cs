@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Windows;
 using BL.DTOs;
+using log4net;
 
 namespace UI
 {
     public partial class EditTourLogWindow : Window
     {
+        private static readonly ILog _log = LogManager.GetLogger(typeof(EditTourLogWindow));
+
         public DateTime Date { get; private set; }
         public TimeSpan Duration { get; private set; }
         public float TotalDistance { get; private set; }
@@ -17,6 +20,8 @@ namespace UI
         public EditTourLogWindow(TourLogDto tourLog)
         {
             InitializeComponent();
+
+            _log.Info("EditTourLogWindow opened for editing.");
 
             // Pre-fill fields with existing data
             DateTextBox.Text = tourLog.DateTime.ToString("yyyy-MM-dd");
@@ -50,6 +55,7 @@ namespace UI
 
             if (errors.Count > 0)
             {
+                _log.Warn("Validation errors in EditTourLogWindow:\n" + string.Join("\n", errors));
                 MessageBox.Show(string.Join("\n", errors), "Validation Errors", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -61,12 +67,14 @@ namespace UI
             Difficulty = difficulty;
             Rating = rating;
 
+            _log.Info("Tour log edit confirmed by user.");
             DialogResult = true;
             Close();
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
+            _log.Info("Tour log edit canceled by user.");
             DialogResult = false;
             Close();
         }
