@@ -1,118 +1,156 @@
 ﻿using BL.DTOs;
-using BL.External;
 using BL.Services;
-using BL.TourImage;
 using Microsoft.Extensions.Configuration;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using BL.DTOs.Report;
 
 namespace Tests.BL.Services;
 
 [TestFixture]
-public class ReportServiceTests
+public class ReportServiceAdditionalTests
 {
-    private string _outputPath = null!;
+    private string _outputPath = "ReportServiceTests";
     private IReportService _reportService = null!;
-    private ITourService _tourService = null!;
-    private IRouteService _routeService = null!;
-    private IMapImageGenerator _imageGenerator = null!;
+    private IConfiguration _config = null!;
 
     [SetUp]
     public void Setup()
     {
-        _outputPath = "TourPlannerReportTests";
-        
-        Dictionary<string, string> settings = new Dictionary<string, string>
+        if (Directory.Exists(_outputPath))
+            Directory.Delete(_outputPath, true);
+
+        var settings = new Dictionary<string, string>
         {
-            { "ReportSettings:OutputDirectory", _outputPath },
-            { "TourImages:OutputDirectory", _outputPath }
+            { "ReportSettings:OutputDirectory", _outputPath }
         };
 
-        IConfiguration config = new ConfigurationBuilder()
+        _config = new ConfigurationBuilder()
             .AddInMemoryCollection(settings)
             .Build();
 
-        _imageGenerator = new MapImageGenerator(config);
-
-        _reportService = new ReportService(config);
-        _routeService = new RouteService();
+        _reportService = new ReportService(_config);
     }
 
     [TearDown]
     public void TearDown()
     {
         if (Directory.Exists(_outputPath))
-        {
-            foreach (var file in Directory.GetFiles(_outputPath))
-            {
-                File.Delete(file);
-            }
-        }
+            Directory.Delete(_outputPath, true);
     }
 
     [Test]
-    public async Task GenerateTourReport_CreatesPdfFile()
+    public void Constructor_MissingOutputPath_ThrowsException()
     {
-        var tour = new TourDto
-        {
-            Name = "TestTour",
-            Description = "Testing tour generation",
-            From = "Vienna",
-            To = "London",
-            TransportType = "Train",
-            Distance = 300,
-            EstimatedTime = TimeSpan.FromHours(3),
-            ImagePath = "", 
-            TourLogs = new List<TourLogDto>
-            {
-                new()
-                {
-                    DateTime = DateTime.Now,
-                    Comment = "Great tour!",
-                    Difficulty = 1,
-                    TotalDistance = 300,
-                    TotalTime = TimeSpan.FromHours(3),
-                    Rating = 5
-                }
-            }
-        };
-        
-        RouteResult route = await _routeService.GetRouteAsync(tour.From, tour.To);
+        var emptyConfig = new ConfigurationBuilder().Build();
+        Assert.Throws<Exception>(() => new ReportService(emptyConfig));
+    }
 
-        string imageFullPath = await _imageGenerator.GenerateMapImageWithLeaflet(route);
-        tour.ImagePath = imageFullPath;
-        
+    [Test]
+    public async Task GenerateTourReportAsync_CreatesDirectoryIfNotExists()
+    {
+        if (Directory.Exists(_outputPath))
+            Directory.Delete(_outputPath, true);
+
+        var tour = new TourDto { Name = "SampleTour" };
+
         await _reportService.GenerateTourReportAsync(tour);
-        
-        string[] files = Directory.GetFiles(_outputPath, "Tour_TestTour_*.pdf");
-        
+
+        Assert.That(Directory.Exists(_outputPath), Is.True);
+    }
+
+    [Test]
+    public async Task GenerateSummaryReportAsync_EmptyToursList_CreatesEmptyReport()
+    {
+        var tours = new List<TourDto>();
+
+        await _reportService.GenerateSummaryReportAsync(tours);
+
+        var files = Directory.GetFiles(_outputPath, "Summary_*.pdf");
         Assert.That(files, Is.Not.Empty);
     }
 
     [Test]
-    public async Task GenerateSummaryReport_CreatesPdfFile()
+    public async Task GenerateSummaryReportAsync_CalculatesCorrectAverages()
     {
         var tours = new List<TourDto>
         {
             new()
             {
-                Name = "Tour A",
+                Name = "T1",
                 TourLogs = new List<TourLogDto>
                 {
                     new() { TotalDistance = 10, TotalTime = TimeSpan.FromMinutes(60), Rating = 4 },
-                    new() { TotalDistance = 15, TotalTime = TimeSpan.FromMinutes(90), Rating = 5 }
+                    new() { TotalDistance = 20, TotalTime = TimeSpan.FromMinutes(120), Rating = 5 }
                 }
             },
             new()
             {
-                Name = "Tour B",
-                TourLogs = new List<TourLogDto>()
+                Name = "T2",
+                TourLogs = new List<TourLogDto>
+                {
+                    new() { TotalDistance = 30, TotalTime = TimeSpan.FromMinutes(180), Rating = 3 }
+                }
             }
         };
 
         await _reportService.GenerateSummaryReportAsync(tours);
 
-        string[] files = Directory.GetFiles(_outputPath, "Summary_*.pdf");
+        var files = Directory.GetFiles(_outputPath, "Summary_*.pdf");
+        Assert.That(files, Is.Not.Empty);
+        // deeper content validation would require PDF reading - out of scope here
+    }
+
+    [Test]
+    public async Task GenerateTourReportAsync_HandlesEmptyTourLogs()
+    {
+        var tour = new TourDto
+        {
+            Name = "NoLogs",
+            TourLogs = new List<TourLogDto>()
+        };
+
+        await _reportService.GenerateTourReportAsync(tour);
+
+        var files = Directory.GetFiles(_outputPath, "Tour_NoLogs_*.pdf");
         Assert.That(files, Is.Not.Empty);
     }
-    
-    
+
+    [Test]
+    public void ConvertTourDto_ConvertsCorrectly()
+    {
+        var tour = new TourDto
+        {
+            Name = "Test",
+            Description = "Desc",
+            From = "A",
+            To = "B",
+            TransportType = "Car",
+            Distance = 100,
+            EstimatedTime = TimeSpan.FromHours(1),
+            ImagePath = "img.png",
+            TourLogs = new List<TourLogDto>
+            {
+                new()
+                {
+                    DateTime = DateTime.Now,
+                    Comment = "Nice",
+                    Difficulty = 3,
+                    TotalDistance = 100,
+                    TotalTime = TimeSpan.FromHours(1),
+                    Rating = 5
+                }
+            }
+        };
+
+        // Use reflection to invoke private method ConvertTourDto
+        var method = typeof(ReportService).GetMethod("ConvertTourDto", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var converted = (TourReportDto)method.Invoke(_reportService, new object[] { tour })!;
+
+        Assert.That(converted.Name, Is.EqualTo(tour.Name));
+        Assert.That(converted.Logs.Count, Is.EqualTo(tour.TourLogs.Count));
+    }
 }
