@@ -46,7 +46,7 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Content="+" Width="30" Command="{Binding AddTourCommand}"/>
                         <Button Content="-" Width="30" Command="{Binding OpenRemoveTourWindowCommand}"/>
-                        <Button Content="..." Width="30" Command="{Binding OpenEditTourWindowCommand}" />
+                        <Button Content="✎" Width="30" Command="{Binding OpenEditTourWindowCommand}" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
@@ -97,7 +97,8 @@
                     <DataGrid x:Name="TourLogGrid"
                               AutoGenerateColumns="False"
                               ItemsSource="{Binding TourLogs}"
-                              SelectedItem="{Binding SelectedTourLog}">
+                              SelectedItem="{Binding SelectedTourLog}"
+                              IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Date" Binding="{Binding DateTime, StringFormat=d}"/>
                             <DataGridTextColumn Header="Duration" Binding="{Binding TotalTime}"/>
@@ -108,9 +109,11 @@
                         </DataGrid.Columns>
                     </DataGrid>
 
+
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
                         <Button Content="+" Width="30" Command="{Binding AddTourLogCommand}" Margin="0,0,5,0"/>
                         <Button Content="-" Width="30" Command="{Binding RemoveTourLogCommand}"/>
+                        <Button Content="✎" Width="30" Command="{Binding EditTourLogCommand}" Margin="0,0,5,0"/>
                     </StackPanel>
                 </StackPanel>
             </GroupBox>

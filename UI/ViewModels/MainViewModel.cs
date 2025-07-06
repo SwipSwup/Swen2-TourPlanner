@@ -22,10 +22,10 @@ namespace UI.ViewModels
 
         public ICommand AddTourCommand { get; }
         public ICommand AddTourLogCommand { get; }
+        public ICommand EditTourLogCommand { get; }
         public ICommand RemoveTourLogCommand { get; }
         public ICommand OpenEditTourWindowCommand { get; }
         public ICommand OpenRemoveTourWindowCommand { get; }
-
         public ICommand ImportToursCommand { get; }
         public ICommand ExportToursCommand { get; }
         public RelayCommand GenerateSummaryReportCommand { get; }
@@ -62,6 +62,7 @@ namespace UI.ViewModels
                 {
                     _selectedTourLog = value;
                     NotifyPropertyChanged();
+                    ((RelayCommand)EditTourLogCommand).RaiseCanExecuteChanged();
                 }
             }
         }
@@ -74,10 +75,11 @@ namespace UI.ViewModels
             Tours = new ObservableCollection<TourDto>();
 
             AddTourCommand = new RelayCommand(async _ => await AddTour());
-            AddTourLogCommand = new RelayCommand(_ => AddTourLog());
+            AddTourLogCommand = new RelayCommand(async _ => await AddTourLogAsync());
             RemoveTourLogCommand = new RelayCommand(async _ => await RemoveTourLogAsync());
             OpenEditTourWindowCommand = new RelayCommand(_ => OpenEditTourWindow());
             OpenRemoveTourWindowCommand = new RelayCommand(_ => OpenRemoveTourWindow());
+            EditTourLogCommand = new RelayCommand(async _ => await UpdateTourLogAsync(), _ => SelectedTourLog != null);
 
             ImportToursCommand = new RelayCommand(async _ => await ImportToursAsync());
             ExportToursCommand = new RelayCommand(async _ => await ExportToursAsync());
@@ -133,7 +135,7 @@ namespace UI.ViewModels
             }
         }
 
-        private async void AddTourLog()
+        private async Task AddTourLogAsync()
         {
             if (SelectedTour == null)
             {
@@ -176,7 +178,45 @@ namespace UI.ViewModels
             }
         }
 
-        // Updated RemoveTourLog method to call service and update UI accordingly
+        public async Task UpdateTourLogAsync()
+        {
+            if (SelectedTourLog == null)
+                return;
+
+            var editLogWindow = new EditTourLogWindow(SelectedTourLog);
+            bool? result = editLogWindow.ShowDialog();
+
+            if (result == true)
+            {
+                // Update SelectedTourLog properties from window
+                SelectedTourLog.DateTime = editLogWindow.Date;
+                SelectedTourLog.TotalTime = editLogWindow.Duration;
+                SelectedTourLog.TotalDistance = editLogWindow.TotalDistance;
+                SelectedTourLog.Comment = editLogWindow.Comment;
+                SelectedTourLog.Difficulty = editLogWindow.Difficulty;
+                SelectedTourLog.Rating = editLogWindow.Rating;
+
+                try
+                {
+                    await _tourService.UpdateTourLogAsync(SelectedTourLog);
+
+                    // Refresh logs for the selected tour after update
+                    var updatedTour = (await _tourService.GetAllToursAsync())
+                        .FirstOrDefault(t => t.Id == SelectedTour.Id);
+
+                    if (updatedTour != null)
+                    {
+                        SelectedTour.TourLogs = updatedTour.TourLogs;
+                        NotifyPropertyChanged(nameof(TourLogs));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error updating tour log: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
         private async Task RemoveTourLogAsync()
         {
             if (SelectedTour == null || SelectedTourLog == null)
@@ -312,9 +352,7 @@ namespace UI.ViewModels
         }
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         public event PropertyChangedEventHandler? PropertyChanged;
     }

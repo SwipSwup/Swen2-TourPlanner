@@ -72,11 +72,28 @@ public class TourRepository(TourPlannerContext context) : ITourRepository
     public async Task<List<TourLog>> GetLogsForTourAsync(int tourId)
         => await context.TourLogs.Where(t => t.TourId == tourId).ToListAsync();
 
-    public async Task UpdateTourLogAsync(TourLog log)
+    public async Task UpdateTourLogAsync(TourLog updatedLog)
     {
-        context.TourLogs.Update(log);
-        await context.SaveChangesAsync();
+        var existingLog = await context.TourLogs.FindAsync(updatedLog.Id);
+
+        if (existingLog != null)
+        {
+
+            existingLog.DateTime = updatedLog.DateTime;
+            existingLog.TotalTime = updatedLog.TotalTime;
+            existingLog.TotalDistance = updatedLog.TotalDistance;
+            existingLog.Comment = updatedLog.Comment;
+            existingLog.Difficulty = updatedLog.Difficulty;
+            existingLog.Rating = updatedLog.Rating;
+
+            await context.SaveChangesAsync();
+        }
+        else
+        {
+            throw new Exception($"TourLog with ID {updatedLog.Id} not found.");
+        }
     }
+
 
     public async Task DeleteTourLogAsync(int logId)
     {
