@@ -40,5 +40,18 @@ namespace UI
                 MessageBox.Show($"Failed to load tours: {e.Message}");
             }
         }
+
+        private async void AddRandomTour_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await _viewModel.AddRandomTour();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to add random tour: {ex.Message}");
+            }
+        }
+
     }
 }

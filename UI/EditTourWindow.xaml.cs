@@ -13,7 +13,7 @@ namespace UI
         {
             InitializeComponent();
 
-          
+
             EditedTour = new TourDto
             {
                 Id = selectedTour.Id,

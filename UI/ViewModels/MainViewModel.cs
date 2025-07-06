@@ -10,6 +10,7 @@ using BL.DTOs;
 using BL.Services;
 using Microsoft.Win32;
 using UI.Commands;
+using UI.Views;
 
 namespace UI.ViewModels
 {
@@ -30,6 +31,25 @@ namespace UI.ViewModels
         public ICommand ExportToursCommand { get; }
         public RelayCommand GenerateSummaryReportCommand { get; }
         public RelayCommand GenerateTourReportCommand { get; }
+
+        public ICommand AddRandomTourCommand { get; }
+
+        private static readonly List<string> EuropeanCities = new()
+        {
+            "Vienna", "Paris", "Berlin", "Rome", "Madrid", "Lisbon", "Amsterdam",
+            "Brussels", "Copenhagen", "Dublin", "Oslo", "Stockholm", "Helsinki",
+            "Warsaw", "Budapest", "Prague", "Zurich", "Munich", "Hamburg", "Barcelona",
+            "Milan", "Venice", "Athens", "Edinburgh", "London", "Manchester", "Birmingham",
+            "Glasgow", "Reykjavik", "Tallinn", "Riga", "Vilnius", "Ljubljana", "Bratislava",
+            "Luxembourg", "Valletta", "San Marino", "Monaco", "Andorra la Vella", "Belgrade",
+            "Zagreb", "Sarajevo", "Skopje", "Podgorica", "Pristina", "Tirana", "Sofia",
+            "Bucharest", "Chisinau", "Kiev", "Minsk", "Moscow", "St. Petersburg", "Istanbul",
+            "Ankara", "Nice", "Lyon", "Marseille", "Bordeaux", "Seville", "Porto", "Genoa",
+            "Naples", "Florence", "Turin", "Palermo", "Valencia", "Bilbao", "Malaga", "Granada",
+            "Split", "Dubrovnik", "Krakow", "Gdansk", "Lodz", "Katowice", "Wroclaw", "Poznan",
+            "Vilnius", "Kaunas", "Tallinn", "Riga", "Paphos", "Limassol", "Funchal", "Madeira",
+            "Canary Islands", "Corsica", "Sardinia", "Sicily", "Crete", "Rhodes", "Santorini"
+        };
 
         private TourDto? _selectedTour;
         public TourDto? SelectedTour
@@ -131,6 +151,39 @@ namespace UI.ViewModels
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error creating tour: {ex.Message}");
+                }
+            }
+        }
+
+        internal async Task AddRandomTour()
+        {
+            var window = new AddRandomTourWindow();
+            if (window.ShowDialog() == true)
+            {
+                var random = new Random();
+                string randomDestination = EuropeanCities[random.Next(EuropeanCities.Count)];
+
+                string name = $"{window.From} to {randomDestination}";
+
+                string finalDescription = $"{window.UserDescription?.Trim()}\nThis is a trip from {window.From} to {randomDestination}.";
+
+                var newTour = new TourDto
+                {
+                    Name = name,
+                    Description = finalDescription,
+                    From = window.From,
+                    To = randomDestination,
+                    TransportType = window.TransportType
+                };
+
+                try
+                {
+                    await _tourService.CreateTourAsync(newTour);
+                    await LoadToursAsync();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error adding random tour: {ex.Message}");
                 }
             }
         }
