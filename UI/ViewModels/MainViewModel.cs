@@ -42,7 +42,6 @@ namespace UI.ViewModels
                     _selectedTour = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged(nameof(TourLogs));
-
                     GenerateTourReportCommand?.RaiseCanExecuteChanged();
                 }
             }
@@ -76,7 +75,7 @@ namespace UI.ViewModels
 
             AddTourCommand = new RelayCommand(async _ => await AddTour());
             AddTourLogCommand = new RelayCommand(_ => AddTourLog());
-            RemoveTourLogCommand = new RelayCommand(_ => RemoveTourLog());
+            RemoveTourLogCommand = new RelayCommand(async _ => await RemoveTourLogAsync());
             OpenEditTourWindowCommand = new RelayCommand(_ => OpenEditTourWindow());
             OpenRemoveTourWindowCommand = new RelayCommand(_ => OpenRemoveTourWindow());
 
@@ -113,7 +112,6 @@ namespace UI.ViewModels
                     From = addTourWindow.From,
                     To = addTourWindow.To,
                     TransportType = addTourWindow.TransportType,
-
                 };
 
                 var errors = newTour.Validate();
@@ -161,7 +159,7 @@ namespace UI.ViewModels
                 {
                     await _tourService.AddTourLogAsync(SelectedTour.Id, newLog);
 
-                    // Reload tours or just refresh logs for the selected tour
+                    // Refresh logs for the selected tour
                     var updatedTour = (await _tourService.GetAllToursAsync())
                         .FirstOrDefault(t => t.Id == SelectedTour.Id);
 
@@ -178,14 +176,32 @@ namespace UI.ViewModels
             }
         }
 
-
-        private void RemoveTourLog()
+        // Updated RemoveTourLog method to call service and update UI accordingly
+        private async Task RemoveTourLogAsync()
         {
-            if (SelectedTour != null && SelectedTourLog != null)
+            if (SelectedTour == null || SelectedTourLog == null)
             {
+                MessageBox.Show("Please select a tour and a tour log to delete.", "Delete Tour Log", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var result = MessageBox.Show("Are you sure you want to delete the selected tour log?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            try
+            {
+                await _tourService.DeleteTourLogAsync(SelectedTourLog.Id);
+
+                // Remove from local collection
                 SelectedTour.TourLogs.Remove(SelectedTourLog);
                 SelectedTourLog = null;
+
                 NotifyPropertyChanged(nameof(TourLogs));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error deleting tour log: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
