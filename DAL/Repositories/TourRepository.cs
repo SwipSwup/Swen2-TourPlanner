@@ -19,8 +19,7 @@ public class TourRepository(TourPlannerContext context) : ITourRepository
 
     public async Task UpdateTourAsync(Tour updatedTour)
     {
-
-        var existingTour = await context.Tours.FindAsync(updatedTour.Id);
+        Tour? existingTour = await context.Tours.FindAsync(updatedTour.Id);
 
         if (existingTour != null)
         {
@@ -45,8 +44,9 @@ public class TourRepository(TourPlannerContext context) : ITourRepository
     public async Task DeleteTourAsync(int id)
     {
         Tour? tour = await context.Tours.FindAsync(id);
-        Console.WriteLine("TEST");
-        if (tour is null) return;
+        
+        if (tour is null) 
+            return;
 
         context.Tours.Remove(tour);
         await context.SaveChangesAsync();
@@ -98,7 +98,8 @@ public class TourRepository(TourPlannerContext context) : ITourRepository
     public async Task DeleteTourLogAsync(int logId)
     {
         TourLog? log = await context.TourLogs.FindAsync(logId);
-        if (log is null) return;
+        if (log is null) 
+            return;
 
         context.TourLogs.Remove(log);
         await context.SaveChangesAsync();

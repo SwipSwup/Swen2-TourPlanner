@@ -9,7 +9,7 @@ public static class TourReportGenerator
 {
     public static void Generate(TourReportDto tour, string outputPath)
     {
-        var document = Document.Create(container =>
+        Document document = Document.Create(container =>
         {
             container.Page(page =>
             {

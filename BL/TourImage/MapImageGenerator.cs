@@ -46,16 +46,16 @@ public class MapImageGenerator(IConfiguration config) : IMapImageGenerator
             string imageFileName = $"map_{Guid.NewGuid()}.png";
             string outputImagePath = Path.Combine(OutputPath, imageFileName);
 
-            var browserFetcher = new BrowserFetcher();
+            BrowserFetcher browserFetcher = new BrowserFetcher();
             await browserFetcher.DownloadAsync();
 
-            await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+            await using IBrowser? browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = true,
                 Args = ["--no-sandbox", "--disable-setuid-sandbox"]
             });
 
-            await using var page = await browser.NewPageAsync();
+            await using IPage? page = await browser.NewPageAsync();
 
             string fileUri = new Uri(tempHtmlPath).AbsoluteUri;
 

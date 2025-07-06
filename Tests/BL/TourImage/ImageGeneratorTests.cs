@@ -1,9 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using BL.TourImage;
+﻿using BL.TourImage;
 using Microsoft.Extensions.Configuration;
-using NUnit.Framework;
+
+namespace Tests.BL.TourImage;
 
 [TestFixture]
 public class MapImageGeneratorTests

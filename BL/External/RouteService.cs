@@ -4,16 +4,11 @@ using System.Text.Json;
 
 namespace BL.External;
 
-public class RouteService : IRouteService
+public class RouteService(HttpClient? client = null) : IRouteService
 {
-    private readonly HttpClient _httpClient;
+    private readonly HttpClient _httpClient = client ?? new HttpClient();
     private const string ApiKey = "5b3ce3597851110001cf6248d1538c5cac7e47e09f411484b475dd46"; 
     private const string ApiEndpoint = "https://api.openrouteservice.org/v2/directions/driving-car";
-
-    public RouteService(HttpClient? client = null)
-    {
-        _httpClient = client ?? new HttpClient();
-    }
 
     public async Task<RouteResult> GetRouteAsync(string from, string to)
     {
@@ -40,20 +35,16 @@ public class RouteService : IRouteService
 
         HttpResponseMessage response = await _httpClient.SendAsync(requestMessage);
         response.EnsureSuccessStatusCode();
-        string json = await response.Content.ReadAsStringAsync();
 
-        using JsonDocument doc = JsonDocument.Parse(json);
+        using JsonDocument doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
 
         JsonElement summary = doc.RootElement.GetProperty("routes")[0]
             .GetProperty("summary");
 
-        float distance = (float)summary.GetProperty("distance").GetDouble() / 1000;
-        TimeSpan duration = TimeSpan.FromSeconds(summary.GetProperty("duration").GetDouble());
-
         return new RouteResult
         {
-            Distance = distance,
-            EstimatedTime = duration,
+            Distance = (float)summary.GetProperty("distance").GetDouble() / 1000,
+            EstimatedTime = TimeSpan.FromSeconds(summary.GetProperty("duration").GetDouble()),
             StartLatitude = startCoords.Latitude,
             StartLongitude = startCoords.Longitude,
             EndLatitude = endCoords.Latitude,
@@ -71,9 +62,7 @@ public class RouteService : IRouteService
         if (!response.IsSuccessStatusCode) 
             return null;
 
-        string json = await response.Content.ReadAsStringAsync();
-        
-        using JsonDocument doc = JsonDocument.Parse(json);
+        using JsonDocument doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
         JsonElement coords = doc.RootElement.GetProperty("features")[0].GetProperty("geometry")
             .GetProperty("coordinates");
         

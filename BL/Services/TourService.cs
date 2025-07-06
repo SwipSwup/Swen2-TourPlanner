@@ -8,18 +8,18 @@ using Microsoft.Extensions.Configuration;
 
 namespace BL.Services;
 
-public class TourService(IConfiguration config, ITourRepository repo, IRouteService routeService, IMapImageGenerator mapImageGenerator) : ITourService
+public class TourService(
+    IConfiguration config,
+    ITourRepository repo,
+    IRouteService routeService,
+    IMapImageGenerator mapImageGenerator) : ITourService
 {
     public async Task<List<TourDto>> GetAllToursAsync()
     {
-        List<Tour> tours = await repo.GetAllToursAsync();
         List<TourDto> dtos = new();
 
-        foreach (Tour tour in tours)
+        foreach (Tour tour in await repo.GetAllToursAsync())
         {
-            int popularity = await repo.GetTourPopularityAsync(tour.Id);
-            bool isChildFriendly = await repo.IsChildFriendlyAsync(tour.Id);
-
             dtos.Add(new TourDto
             {
                 Id = tour.Id,
@@ -31,8 +31,8 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
                 Distance = tour.Distance,
                 EstimatedTime = tour.EstimatedTime,
                 ImagePath = tour.ImagePath,
-                Popularity = popularity,
-                IsChildFriendly = isChildFriendly,
+                Popularity = await repo.GetTourPopularityAsync(tour.Id),
+                IsChildFriendly = await repo.IsChildFriendlyAsync(tour.Id),
                 TourLogs = tour.TourLogs.Select(l => new TourLogDto
                 {
                     Id = l.Id,
@@ -52,8 +52,6 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
     public async Task CreateTourAsync(TourDto dto)
     {
         RouteResult route = await routeService.GetRouteAsync(dto.From, dto.To);
-        
-        string imageFullPath = await mapImageGenerator.GenerateMapImageWithLeaflet(route);
 
         Tour tour = new()
         {
@@ -64,7 +62,7 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
             TransportType = dto.TransportType,
             Distance = route.Distance,
             EstimatedTime = route.EstimatedTime,
-            ImagePath = imageFullPath
+            ImagePath = await mapImageGenerator.GenerateMapImageWithLeaflet(route)
         };
 
         await repo.AddTourAsync(tour);
@@ -93,11 +91,10 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
 
         await repo.AddTourLogAsync(log);
     }
+
     public async Task UpdateTourAsync(TourDto dto)
     {
         RouteResult route = await routeService.GetRouteAsync(dto.From, dto.To);
-        
-        string imageFullPath = await mapImageGenerator.GenerateMapImageWithLeaflet(route);
 
         var tour = new Tour
         {
@@ -109,11 +106,12 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
             TransportType = dto.TransportType,
             Distance = route.Distance,
             EstimatedTime = route.EstimatedTime,
-            ImagePath = imageFullPath
+            ImagePath = await mapImageGenerator.GenerateMapImageWithLeaflet(route)
         };
 
         await repo.UpdateTourAsync(tour);
     }
+
     public async Task UpdateTourLogAsync(TourLogDto logDto)
     {
         TourLog log = new()
@@ -143,8 +141,7 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
 
     public async Task<List<TourLogDto>> GetLogsForTourAsync(int tourId)
     {
-        var logs = await repo.GetLogsForTourAsync(tourId);
-        return logs.Select(l => new TourLogDto
+        return (await repo.GetLogsForTourAsync(tourId)).Select(l => new TourLogDto
         {
             Id = l.Id,
             Comment = l.Comment,
@@ -155,10 +152,10 @@ public class TourService(IConfiguration config, ITourRepository repo, IRouteServ
             Rating = l.Rating
         }).ToList();
     }
+
     public async Task ImportToursFromJsonAsync(string filePath)
     {
-        string json = await File.ReadAllTextAsync(filePath);
-        var tours = JsonSerializer.Deserialize<List<TourDto>>(json);
+        List<TourDto>? tours = JsonSerializer.Deserialize<List<TourDto>>(await File.ReadAllTextAsync(filePath));
         if (tours != null)
             await CreateToursAsync(tours);
     }

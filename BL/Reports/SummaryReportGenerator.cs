@@ -9,7 +9,7 @@ public static class SummaryReportGenerator
 {
     public static void Generate(List<SummaryEntryDto> entries, string outputPath)
     {
-        var document = Document.Create(container =>
+        Document document = Document.Create(container =>
         {
             container.Page(page =>
             {
@@ -37,7 +37,7 @@ public static class SummaryReportGenerator
                         header.Cell().Text("Avg Rating").Bold();
                     });
 
-                    foreach (var entry in entries)
+                    foreach (SummaryEntryDto entry in entries)
                     {
                         table.Cell().Text(entry.TourName);
                         table.Cell().Text(entry.AvgDistance.ToString("0.00"));

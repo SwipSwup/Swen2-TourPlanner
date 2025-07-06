@@ -31,19 +31,15 @@ namespace Tests.BL.External
         [Test]
         public async Task GetRouteAsync_ValidLocations_ReturnsValidResult()
         {
-            // Arrange
-            var service = new RouteService(_mockHttpClient);
+            RouteService service = new RouteService(_mockHttpClient);
 
-            // Setup fake geocode + route data
             _mockHandler.SetupGeocode("Vienna", 48.2082, 16.3738);
             _mockHandler.SetupGeocode("Graz", 47.0707, 15.4395);
             _mockHandler.SetupRoute(200000, 7200); // 200km, 2h
 
-            // Act
             RouteResult result = await service.GetRouteAsync("Vienna", "Graz");
 
             
-            // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Distance, Is.EqualTo(200f));
             Assert.That(result.EstimatedTime, Is.EqualTo(TimeSpan.FromHours(2)));
