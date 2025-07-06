@@ -13,7 +13,7 @@ namespace UI
         {
             InitializeComponent();
 
-            // Make a **copy** to avoid direct editing of the original until confirmed
+          
             EditedTour = new TourDto
             {
                 Id = selectedTour.Id,
@@ -35,9 +35,7 @@ namespace UI
             ToTextBox.Text = EditedTour.To;
             TransportTypeComboBox.ItemsSource = new string[] { "Car", "Bike", "Foot", "Train" };
             TransportTypeComboBox.SelectedItem = EditedTour.TransportType;
-            DistanceTextBox.Text = EditedTour.Distance.ToString();
-            TimeTextBox.Text = EditedTour.EstimatedTime.ToString();
-            ImagePathTextBox.Text = EditedTour.ImagePath;
+
         }
 
         private void Confirm_Click(object sender, RoutedEventArgs e)
@@ -47,9 +45,7 @@ namespace UI
             EditedTour.From = FromTextBox.Text;
             EditedTour.To = ToTextBox.Text;
             EditedTour.TransportType = TransportTypeComboBox.SelectedItem?.ToString();
-            EditedTour.Distance = float.TryParse(DistanceTextBox.Text, out var dist) ? dist : 0;
-            EditedTour.EstimatedTime = TimeSpan.TryParse(TimeTextBox.Text, out var time) ? time : TimeSpan.Zero;
-            EditedTour.ImagePath = ImagePathTextBox.Text;
+
 
             var errors = EditedTour.Validate();
             if (errors.Count > 0)
@@ -68,18 +64,6 @@ namespace UI
             Close();
         }
 
-        private void SelectImage_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog
-            {
-                Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp",
-                Title = "Select Route Image"
-            };
 
-            if (openFileDialog.ShowDialog() == true)
-            {
-                ImagePathTextBox.Text = openFileDialog.FileName;
-            }
-        }
     }
 }
