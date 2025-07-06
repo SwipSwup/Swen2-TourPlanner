@@ -55,8 +55,19 @@ public class TourRepository(TourPlannerContext context) : ITourRepository
     public async Task AddTourLogAsync(TourLog log)
     {
         context.TourLogs.Add(log);
-        await context.SaveChangesAsync();
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error adding tour log: {ex.Message}");
+            Console.WriteLine($"Inner: {ex.InnerException?.Message}");
+        }
     }
+
+
 
     public async Task<List<TourLog>> GetLogsForTourAsync(int tourId)
         => await context.TourLogs.Where(t => t.TourId == tourId).ToListAsync();

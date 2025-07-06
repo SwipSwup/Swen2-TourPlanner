@@ -45,7 +45,7 @@ namespace UI
                 return;
             }
 
-            Date = date;
+            Date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
             Duration = duration;
             TotalDistance = distance;
             Comment = comment;
