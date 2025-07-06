@@ -113,8 +113,7 @@ namespace UI.ViewModels
                     From = addTourWindow.From,
                     To = addTourWindow.To,
                     TransportType = addTourWindow.TransportType,
-                    Distance = addTourWindow.Distance,
-                    EstimatedTime = addTourWindow.EstimatedTime
+
                 };
 
                 var errors = newTour.Validate();

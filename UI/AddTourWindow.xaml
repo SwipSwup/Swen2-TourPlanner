@@ -31,12 +31,6 @@
         <TextBlock Text="To:" Grid.Row="3" Grid.Column="0" Margin="0,0,5,5" VerticalAlignment="Center"/>
         <TextBox x:Name="ToTextBox" Grid.Row="3" Grid.Column="1" Margin="0,0,0,5"/>
 
-        <TextBlock Text="Distance (km):" Grid.Row="4" Grid.Column="0" Margin="0,0,5,5" VerticalAlignment="Center"/>
-        <TextBox x:Name="DistanceTextBox" Grid.Row="4" Grid.Column="1" Margin="0,0,0,5"/>
-
-        <TextBlock Text="Estimated Time (hours):" Grid.Row="5" Grid.Column="0" Margin="0,0,5,5" VerticalAlignment="Center"/>
-        <TextBox x:Name="TimeTextBox" Grid.Row="5" Grid.Column="1" Margin="0,0,0,5"/>
-
         <TextBlock Text="Transport Type:" Grid.Row="6" Grid.Column="0" Margin="0,0,5,5" VerticalAlignment="Center"/>
         <ComboBox x:Name="TransportTypeComboBox" Grid.Row="6" Grid.Column="1" Margin="0,0,0,5"/>
 

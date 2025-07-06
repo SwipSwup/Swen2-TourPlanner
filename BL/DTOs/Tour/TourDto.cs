@@ -34,12 +34,6 @@ public class TourDto
 
         if (string.IsNullOrWhiteSpace(TransportType))
             errors.Add("Transport type is required.");
-
-        if (Distance <= 0)
-            errors.Add("Distance must be greater than 0.");
-                
-        if (EstimatedTime.TotalMinutes <= 0)
-            errors.Add("Estimated time must be greater than 0.");
         
         return errors;
     }

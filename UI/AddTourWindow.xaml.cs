@@ -9,8 +9,6 @@ namespace UI
         public string TourDescription => DescriptionTextBox.Text;
         public string From => FromTextBox.Text;
         public string To => ToTextBox.Text;
-        public float Distance => float.Parse(DistanceTextBox.Text);
-        public TimeSpan EstimatedTime => TimeSpan.Parse(TimeTextBox.Text);
         public string TransportType => TransportTypeComboBox.Text;
 
 
