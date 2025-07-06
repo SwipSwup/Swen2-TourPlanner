@@ -35,21 +35,17 @@ namespace UI
 
                     services.AddTransient<IMapImageGenerator, MapImageGenerator>();
                     services.AddTransient<ITourService, TourService>();
-                    
+
                     services.AddScoped<ITourRepository, TourRepository>();
-                    
                     services.AddScoped<IRouteService, RouteService>();
                     services.AddScoped<IReportService, ReportService>();
-                    
-                    
                     services.AddScoped<MainViewModel>();
-                    
                 })
                 .Build();
 
             AppHost.Start();
         }
-        
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -60,7 +56,6 @@ namespace UI
             var log = LogManager.GetLogger(typeof(App));
             log.Info("Application started.");
         }
-
 
         protected override void OnExit(ExitEventArgs e)
         {
